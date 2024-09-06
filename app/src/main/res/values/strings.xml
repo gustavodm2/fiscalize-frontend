@@ -1,0 +1,5 @@
+<resources>
+    //e.g your package name + ".fileprovider"
+    <string name="app_name">CameraTest</string>
+    <string name="fileprovider">package com.example.cameratest.fileprovider</string>
+</resources>
