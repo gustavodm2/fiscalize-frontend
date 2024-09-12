@@ -1,10 +1,15 @@
 package com.example.cameratest
 
 import android.Manifest
+import android.content.ContentValues
+import android.content.Context
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,6 +46,7 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.cameratest.ui.theme.CameraTestTheme
 import java.io.File
+import java.io.FileOutputStream
 
 
 class MainActivity : ComponentActivity() {
@@ -49,7 +55,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CameraTestTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -71,51 +76,71 @@ fun AppContent(
     val tempUri = remember { mutableStateOf<Uri?>(null) }
     val authority = stringResource(id = R.string.fileprovider)
 
-    // for takePhotoLauncher used
-    fun getTempUri(): Uri? {
-        val storageDir = File(context.filesDir, "images")
-        if (!storageDir.exists()) {
-            val isDirCreated = storageDir.mkdirs() // Try to create the directory
-            if (!isDirCreated) {
-                Toast.makeText(context, "Failed to create directory for photo", Toast.LENGTH_SHORT).show()
-                return null
-            }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun saveImageToGallery(context: Context, uri: Uri) {
+        val contentResolver = context.contentResolver
+        val sourceInputStream = contentResolver.openInputStream(uri)
+
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "image_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            put(MediaStore.Images.Media.IS_PENDING, 1)
         }
 
-        return try {
-            val file = File.createTempFile(
-                "image_" + System.currentTimeMillis().toString(),
-                ".jpg",
-                storageDir
-            )
+        val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-            FileProvider.getUriForFile(
-                context,
-                authority,
-                file
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
-            null
+        imageUri?.let {
+            contentResolver.openOutputStream(it)?.use { outputStream ->
+                sourceInputStream?.copyTo(outputStream)
+            }
+
+            values.clear()
+            values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            contentResolver.update(imageUri, values, null, null)
+
+            Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
         }
     }
 
+    // Função para salvar a imagem na galeria para versões abaixo do Android 10
+    fun saveImageToLegacyGallery(context: Context, uri: Uri) {
+        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val file = File(picturesDir, "image_${System.currentTimeMillis()}.jpg")
 
-    val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = {
-            it?.let {
-                onSetUri.invoke(it)
-            }
+        val sourceInputStream = context.contentResolver.openInputStream(uri)
+
+        try {
+            val outputStream = FileOutputStream(file)
+            sourceInputStream?.copyTo(outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            // Notificar a galeria que uma nova imagem foi adicionada
+            MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
+
+            Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
         }
-    )
+    }
 
+    // Função para capturar a imagem e salvar na galeria
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = { _ ->
-            tempUri.value?.let {
-                onSetUri.invoke(it)
+        onResult = { isSuccess ->
+            if (isSuccess) {
+                tempUri.value?.let { uri ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        saveImageToGallery(context, uri)
+                    } else {
+                        saveImageToLegacyGallery(context, uri)
+                    }
+                    onSetUri.invoke(uri)
+                }
             }
         }
     )
@@ -125,11 +150,11 @@ fun AppContent(
     ) { isGranted: Boolean ->
         if (isGranted) {
             // Permission is granted, launch takePhotoLauncher
-            val tmpUri = getTempUri()
+            val tmpUri = getTempUri(context, authority)
             tempUri.value = tmpUri
             takePhotoLauncher.launch(tempUri.value)
         } else {
-            // Permission is denied, handle it accordingly
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -143,9 +168,8 @@ fun AppContent(
                 showBottomSheet = false
 
                 val permission = Manifest.permission.CAMERA
-                if (ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                    // Permission is already granted, proceed to step 2
-                    val tmpUri = getTempUri()
+                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+                    val tmpUri = getTempUri(context, authority)
                     if (tmpUri != null) {
                         tempUri.value = tmpUri
                         takePhotoLauncher.launch(tempUri.value)
@@ -153,20 +177,15 @@ fun AppContent(
                         Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // Permission is not granted, request it
                     cameraPermissionLauncher.launch(permission)
                 }
             },
             onPhotoGalleryClick = {
                 showBottomSheet = false
-                imagePicker.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                    )
-                )
             },
         )
     }
+
     Column (
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -180,7 +199,8 @@ fun AppContent(
                     showBottomSheet = true
                 }
             ) {
-                Text(text = "Select / Take")
+                Text(text = "Select / Take");
+                Text(text = "teste");
             }
         }
 
@@ -192,17 +212,44 @@ fun AppContent(
             ) {
                 AsyncImage(
                     model = it,
-                    modifier = Modifier.size(
-                        160.dp
-                    ),
+                    modifier = Modifier.size(160.dp),
                     contentDescription = null,
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
-
     }
 }
+
+fun getTempUri(context: Context, authority: String): Uri? {
+    val storageDir = File(context.filesDir, "images")
+    if (!storageDir.exists()) {
+        val isDirCreated = storageDir.mkdirs()
+        if (!isDirCreated) {
+            Toast.makeText(context, "Failed to create directory for photo", Toast.LENGTH_SHORT).show()
+            return null
+        }
+    }
+
+    return try {
+        val file = File.createTempFile(
+            "image_" + System.currentTimeMillis().toString(),
+            ".jpg",
+            storageDir
+        )
+
+        FileProvider.getUriForFile(
+            context,
+            authority,
+            file
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
+        null
+    }
+}
+
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
@@ -234,12 +281,13 @@ fun MyModalBottomSheet(
         )
     )
 }
+
+
 @RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyModalBottomSheetContent(
     onDismiss: () -> Unit,
-    //header
     header: String = "Choose Option",
 
     items: List<BottomSheetItem> = listOf(),
