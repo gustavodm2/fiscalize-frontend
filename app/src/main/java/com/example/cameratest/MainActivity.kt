@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
@@ -72,22 +73,34 @@ fun AppContent(
 
     // for takePhotoLauncher used
     fun getTempUri(): Uri? {
-        directory?.let {
-            it.mkdirs()
+        val storageDir = File(context.filesDir, "images")
+        if (!storageDir.exists()) {
+            val isDirCreated = storageDir.mkdirs() // Try to create the directory
+            if (!isDirCreated) {
+                Toast.makeText(context, "Failed to create directory for photo", Toast.LENGTH_SHORT).show()
+                return null
+            }
+        }
+
+        return try {
             val file = File.createTempFile(
                 "image_" + System.currentTimeMillis().toString(),
                 ".jpg",
-                File(it, "images")
+                storageDir
             )
 
-            return FileProvider.getUriForFile(
+            FileProvider.getUriForFile(
                 context,
                 authority,
                 file
             )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
+            null
         }
-        return null
     }
+
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -130,7 +143,7 @@ fun AppContent(
                 showBottomSheet = false
 
                 val permission = Manifest.permission.CAMERA
-                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
                     // Permission is already granted, proceed to step 2
                     val tmpUri = getTempUri()
                     if (tmpUri != null) {

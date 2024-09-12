@@ -2,15 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Feature for camera hardware -->
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+        android:required="false"
+        />
 
+    <!-- Read/Write permissions for Android 9 (API 28) and below -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        />
+
+    <!-- Application block -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,6 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CameraTest"
         tools:targetApi="31">
+
+        <!-- MainActivity configuration -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,10 +41,11 @@
             android:theme="@style/Theme.CameraTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- FileProvider configuration -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="@string/fileprovider"
@@ -43,5 +57,4 @@
                 />
         </provider>
     </application>
-
 </manifest>
