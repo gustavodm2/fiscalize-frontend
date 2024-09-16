@@ -3,6 +3,7 @@ package com.example.cameratest
 import android.Manifest
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -200,9 +201,19 @@ fun AppContent(
                 }
             ) {
                 Text(text = "Select / Take");
-                Text(text = "teste");
+
             }
         }
+        Button(
+            onClick = {
+
+                val intent = Intent(context, HomeActivity::class.java)
+                context.startActivity(intent)
+            }
+        ) {
+            Text(text = "Ir para home")
+        }
+
 
         //preview selfie
         uri?.let {

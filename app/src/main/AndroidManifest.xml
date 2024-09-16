@@ -37,6 +37,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true"
+
+            android:theme="@style/Theme.CameraTest">
+
+        </activity>
+
         <!-- FileProvider configuration -->
         <provider
             android:name="androidx.core.content.FileProvider"
