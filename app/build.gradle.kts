@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cameratest"
+    namespace = "com.example.fiscalize"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.cameratest"
+        applicationId = "com.example.fiscalize"
         minSdk = 21
         targetSdk = 34
         versionCode = 1

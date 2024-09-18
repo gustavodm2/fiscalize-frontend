@@ -1,5 +1,5 @@
 <resources>
     //e.g your package name + ".fileprovider"
     <string name="app_name">CameraTest</string>
-    <string name="fileprovider">com.example.cameratest.fileprovider</string>
+    <string name="fileprovider">fiscalize.fileprovider</string>
 </resources>

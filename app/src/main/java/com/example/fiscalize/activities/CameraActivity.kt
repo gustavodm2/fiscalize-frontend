@@ -1,4 +1,4 @@
-package com.example.cameratest
+package com.example.fiscalize.activities
 
 import android.Manifest
 import android.content.ContentValues
@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
@@ -41,34 +40,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.cameratest.ui.theme.CameraTestTheme
+import com.example.fiscalize.R
+import com.example.fiscalize.ui.theme.FiscalizeTheme
 import java.io.File
 import java.io.FileOutputStream
 
 
-class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.N)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            CameraTestTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AppContent()
-                }
-            }
-        }
-    }
-}
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun AppContent(
+fun CameraContent(
+    modifier: Modifier,
+    navController: NavController,
     uri: Uri? = null,
     directory: File? = null,
     onSetUri: (Uri) -> Unit = {}
@@ -200,19 +187,12 @@ fun AppContent(
                     showBottomSheet = true
                 }
             ) {
-                Text(text = "Select / Take");
+                Text(text = "Select / Take")
 
             }
         }
-        Button(
-            onClick = {
+        Text(text = "Ir para home")
 
-                val intent = Intent(context, HomeActivity::class.java)
-                context.startActivity(intent)
-            }
-        ) {
-            Text(text = "Ir para home")
-        }
 
 
         //preview selfie

@@ -1,4 +1,4 @@
-package com.example.cameratest.ui.theme
+package com.example.fiscalize.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
