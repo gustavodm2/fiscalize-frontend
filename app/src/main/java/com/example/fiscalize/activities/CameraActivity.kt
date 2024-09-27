@@ -3,18 +3,15 @@ package com.example.fiscalize.activities
 import android.Manifest
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
@@ -22,7 +19,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -42,28 +38,43 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.fiscalize.R
-import com.example.fiscalize.ui.theme.FiscalizeTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
+
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
+
+import okhttp3.ResponseBody
 
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun CameraContent(
     modifier: Modifier,
-    navController: NavController,
-    uri: Uri? = null,
-    directory: File? = null,
+    uri: NavHostController? = null,
     onSetUri: (Uri) -> Unit = {}
 ) {
     val context = LocalContext.current
     val tempUri = remember { mutableStateOf<Uri?>(null) }
     val authority = stringResource(id = R.string.fileprovider)
 
+    // Função para salvar a imagem na galeria
     @RequiresApi(Build.VERSION_CODES.Q)
     fun saveImageToGallery(context: Context, uri: Uri) {
         val contentResolver = context.contentResolver
@@ -93,7 +104,7 @@ fun CameraContent(
         }
     }
 
-    // Função para salvar a imagem na galeria para versões abaixo do Android 10
+    // Função para salvar a imagem na galeria legada
     fun saveImageToLegacyGallery(context: Context, uri: Uri) {
         val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         val file = File(picturesDir, "image_${System.currentTimeMillis()}.jpg")
@@ -106,7 +117,6 @@ fun CameraContent(
             outputStream.flush()
             outputStream.close()
 
-            // Notificar a galeria que uma nova imagem foi adicionada
             MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
 
             Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
@@ -116,7 +126,34 @@ fun CameraContent(
         }
     }
 
-    // Função para capturar a imagem e salvar na galeria
+    // Função para fazer o upload da imagem
+    fun uploadImage(context: Context, imageFile: File) {
+        val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+
+        val apiService = RetrofitInstance.api
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = apiService.uploadImage(body)
+                withContext(Dispatchers.Main) {
+                    if (response.isExecuted) {
+                        Toast.makeText(context, "Upload successful!", Toast.LENGTH_SHORT).show()
+                        Log.d("bom", "foi legal")
+                    } else {
+                        Toast.makeText(context, "Upload failed: ", Toast.LENGTH_SHORT).show()
+                        Log.d("ruim", "deu problema")
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Error byceasf: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // Launcher para tirar foto
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { isSuccess ->
@@ -127,17 +164,20 @@ fun CameraContent(
                     } else {
                         saveImageToLegacyGallery(context, uri)
                     }
+                    // Chama a função de upload
+                    val imageFile = File(uri.path ?: "")
+                    uploadImage(context, imageFile)
                     onSetUri.invoke(uri)
                 }
             }
         }
     )
 
+    // Launcher para permissão da câmera
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permission is granted, launch takePhotoLauncher
             val tmpUri = getTempUri(context, authority)
             tempUri.value = tmpUri
             takePhotoLauncher.launch(tempUri.value)
@@ -147,7 +187,7 @@ fun CameraContent(
     }
 
     var showBottomSheet by remember { mutableStateOf(false) }
-    if (showBottomSheet){
+    if (showBottomSheet) {
         MyModalBottomSheet(
             onDismiss = {
                 showBottomSheet = false
@@ -174,10 +214,9 @@ fun CameraContent(
         )
     }
 
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
@@ -188,14 +227,9 @@ fun CameraContent(
                 }
             ) {
                 Text(text = "Select / Take")
-
             }
         }
-        Text(text = "Ir para home")
 
-
-
-        //preview selfie
         uri?.let {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -212,6 +246,7 @@ fun CameraContent(
     }
 }
 
+// Função para criar um URI temporário
 fun getTempUri(context: Context, authority: String): Uri? {
     val storageDir = File(context.filesDir, "images")
     if (!storageDir.exists()) {
@@ -241,93 +276,35 @@ fun getTempUri(context: Context, authority: String): Uri? {
     }
 }
 
-
-@RequiresApi(Build.VERSION_CODES.N)
+// Componente para o BottomSheet
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyModalBottomSheet(
     onDismiss: () -> Unit,
     onTakePhotoClick: () -> Unit,
-    onPhotoGalleryClick: () -> Unit
+    onPhotoGalleryClick: () -> Unit,
 ) {
-    MyModalBottomSheetContent(
-        header = "Choose Option",
-        onDismiss = {
-            onDismiss.invoke()
-        },
-        items = listOf(
-            BottomSheetItem(
-                title = "Take Photo",
-                icon = Icons.Default.AccountBox,
-                onClick = {
-                    onTakePhotoClick.invoke()
-                }
-            ),
-            BottomSheetItem(
-                title = "select image",
-                icon = Icons.Default.Place,
-                onClick = {
-                    onPhotoGalleryClick.invoke()
-                }
-            ),
-        )
-    )
-}
-
-
-@RequiresApi(Build.VERSION_CODES.N)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyModalBottomSheetContent(
-    onDismiss: () -> Unit,
-    header: String = "Choose Option",
-
-    items: List<BottomSheetItem> = listOf(),
-) {
-    val skipPartiallyExpanded by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded
-    )
-    val edgeToEdgeEnabled by remember { mutableStateOf(false) }
-    val windowInsets = if (edgeToEdgeEnabled)
-        WindowInsets(0) else BottomSheetDefaults.windowInsets
-
     ModalBottomSheet(
-        shape = MaterialTheme.shapes.medium.copy(
-            bottomStart = CornerSize(0),
-            bottomEnd = CornerSize(0)
-        ),
-        onDismissRequest = { onDismiss.invoke() },
-        sheetState = bottomSheetState,
-        windowInsets = windowInsets
+        onDismissRequest = { onDismiss() }
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                text = header,
+                text = "Select an option",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
-            items.forEach {item ->
-                androidx.compose.material3.ListItem(
-                    modifier = Modifier.clickable {
-                        item.onClick.invoke()
-                    },
-                    headlineContent = {
-                        Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    },
-                    leadingContent = {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.title
-                        )
-                    },
-                )
+
+            Button(onClick = { onTakePhotoClick() }) {
+                Text(text = "Take Photo")
+            }
+
+            Button(onClick = { onPhotoGalleryClick() }) {
+                Text(text = "Select from Gallery")
             }
         }
     }

@@ -1,11 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val serverIp: String = localProperties.getProperty("SERVER_IP", "server_ip")
+
 android {
     namespace = "com.example.fiscalize"
     compileSdk = 34
+
 
     defaultConfig {
         applicationId = "com.example.fiscalize"
@@ -14,10 +25,12 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "SERVER_IP", "\"$serverIp\"")
     }
 
     buildTypes {
@@ -35,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -74,4 +88,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
     implementation("androidx.core:core:1.12.0")
     implementation ("androidx.navigation:navigation-compose:2.7.1")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-scalars:2.9.0")
 }
