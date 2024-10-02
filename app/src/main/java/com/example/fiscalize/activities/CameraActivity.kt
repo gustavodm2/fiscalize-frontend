@@ -1,54 +1,34 @@
 package com.example.fiscalize.activities
 
 import android.Manifest
-import android.content.ContentValues
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.example.fiscalize.R
-import com.example.fiscalize.ui.theme.FiscalizeTheme
+import coil.compose.rememberAsyncImagePainter
+import com.example.fiscalize.BuildConfig
 import java.io.File
-import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -56,287 +36,69 @@ import java.io.FileOutputStream
 fun CameraContent(
     modifier: Modifier,
     navController: NavController,
-    uri: Uri? = null,
-    directory: File? = null,
-    onSetUri: (Uri) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val tempUri = remember { mutableStateOf<Uri?>(null) }
-    val authority = stringResource(id = R.string.fileprovider)
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun saveImageToGallery(context: Context, uri: Uri) {
-        val contentResolver = context.contentResolver
-        val sourceInputStream = contentResolver.openInputStream(uri)
-
-        val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "image_${System.currentTimeMillis()}.jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-            put(MediaStore.Images.Media.IS_PENDING, 1)
-        }
-
-        val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
-        imageUri?.let {
-            contentResolver.openOutputStream(it)?.use { outputStream ->
-                sourceInputStream?.copyTo(outputStream)
-            }
-
-            values.clear()
-            values.put(MediaStore.Images.Media.IS_PENDING, 0)
-            contentResolver.update(imageUri, values, null, null)
-
-            Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
-        } ?: run {
-            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
-        }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (!success) Toast.makeText(context, "Falha ao capturar a imagem", Toast.LENGTH_SHORT).show()
     }
 
-    // Função para salvar a imagem na galeria para versões abaixo do Android 10
-    fun saveImageToLegacyGallery(context: Context, uri: Uri) {
-        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val file = File(picturesDir, "image_${System.currentTimeMillis()}.jpg")
-
-        val sourceInputStream = context.contentResolver.openInputStream(uri)
-
-        try {
-            val outputStream = FileOutputStream(file)
-            sourceInputStream?.copyTo(outputStream)
-            outputStream.flush()
-            outputStream.close()
-
-            // Notificar a galeria que uma nova imagem foi adicionada
-            MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
-
-            Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Função para capturar a imagem e salvar na galeria
-    val takePhotoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { isSuccess ->
-            if (isSuccess) {
-                tempUri.value?.let { uri ->
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        saveImageToGallery(context, uri)
-                    } else {
-                        saveImageToLegacyGallery(context, uri)
-                    }
-                    onSetUri.invoke(uri)
-                }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        if (permissions[Manifest.permission.CAMERA] == true) {
+            capturedImageUri = createImageFileUri(context)
+            capturedImageUri?.let { uri ->
+                cameraLauncher.launch(uri)
             }
-        }
-    )
-
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            // Permission is granted, launch takePhotoLauncher
-            val tmpUri = getTempUri(context, authority)
-            tempUri.value = tmpUri
-            takePhotoLauncher.launch(tempUri.value)
         } else {
-            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Permissão de câmera negada", Toast.LENGTH_SHORT).show()
         }
     }
 
-    var showBottomSheet by remember { mutableStateOf(false) }
-    if (showBottomSheet){
-        MyModalBottomSheet(
-            onDismiss = {
-                showBottomSheet = false
-            },
-            onTakePhotoClick = {
-                showBottomSheet = false
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
 
-                val permission = Manifest.permission.CAMERA
-                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                    val tmpUri = getTempUri(context, authority)
-                    if (tmpUri != null) {
-                        tempUri.value = tmpUri
-                        takePhotoLauncher.launch(tempUri.value)
-                    } else {
-                        Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    cameraPermissionLauncher.launch(permission)
-                }
-            },
-            onPhotoGalleryClick = {
-                showBottomSheet = false
-            },
-        )
-    }
 
-    Column (
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = {
-                    showBottomSheet = true
-                }
+        Button(onClick = {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
-                Text(text = "Select / Take")
-
-            }
-        }
-        Text(text = "Ir para home")
-
-
-
-        //preview selfie
-        uri?.let {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                AsyncImage(
-                    model = it,
-                    modifier = Modifier.size(160.dp),
-                    contentDescription = null,
+                capturedImageUri = createImageFileUri(context)
+                capturedImageUri?.let { uri -> cameraLauncher.launch(uri) }
+            } else {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+        }) {
+            Text("Tirar Foto")
         }
-    }
-}
 
-fun getTempUri(context: Context, authority: String): Uri? {
-    val storageDir = File(context.filesDir, "images")
-    if (!storageDir.exists()) {
-        val isDirCreated = storageDir.mkdirs()
-        if (!isDirCreated) {
-            Toast.makeText(context, "Failed to create directory for photo", Toast.LENGTH_SHORT).show()
-            return null
+
+        capturedImageUri?.let { uri ->
+            Image(painter = rememberAsyncImagePainter(model = uri), contentDescription = null, modifier = Modifier.fillMaxWidth().height(200.dp))
+            Log.d("URI DA IMAGEM", uri.toString())
         }
-    }
 
-    return try {
-        val file = File.createTempFile(
-            "image_" + System.currentTimeMillis().toString(),
-            ".jpg",
-            storageDir
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-        FileProvider.getUriForFile(
-            context,
-            authority,
-            file
-        )
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, "Failed to create file for photo", Toast.LENGTH_SHORT).show()
-        null
     }
 }
 
-
-@RequiresApi(Build.VERSION_CODES.N)
-@Composable
-fun MyModalBottomSheet(
-    onDismiss: () -> Unit,
-    onTakePhotoClick: () -> Unit,
-    onPhotoGalleryClick: () -> Unit
-) {
-    MyModalBottomSheetContent(
-        header = "Choose Option",
-        onDismiss = {
-            onDismiss.invoke()
-        },
-        items = listOf(
-            BottomSheetItem(
-                title = "Take Photo",
-                icon = Icons.Default.AccountBox,
-                onClick = {
-                    onTakePhotoClick.invoke()
-                }
-            ),
-            BottomSheetItem(
-                title = "select image",
-                icon = Icons.Default.Place,
-                onClick = {
-                    onPhotoGalleryClick.invoke()
-                }
-            ),
-        )
-    )
+@SuppressLint("SimpleDateFormat")
+fun createImageFileUri(context: Context): Uri? {
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    val imageFileName = "JPEG_" + timeStamp + "_"
+    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
+    return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile)
 }
 
 
-@RequiresApi(Build.VERSION_CODES.N)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyModalBottomSheetContent(
-    onDismiss: () -> Unit,
-    header: String = "Choose Option",
 
-    items: List<BottomSheetItem> = listOf(),
-) {
-    val skipPartiallyExpanded by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded
-    )
-    val edgeToEdgeEnabled by remember { mutableStateOf(false) }
-    val windowInsets = if (edgeToEdgeEnabled)
-        WindowInsets(0) else BottomSheetDefaults.windowInsets
-
-    ModalBottomSheet(
-        shape = MaterialTheme.shapes.medium.copy(
-            bottomStart = CornerSize(0),
-            bottomEnd = CornerSize(0)
-        ),
-        onDismissRequest = { onDismiss.invoke() },
-        sheetState = bottomSheetState,
-        windowInsets = windowInsets
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                text = header,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
-            )
-            items.forEach {item ->
-                androidx.compose.material3.ListItem(
-                    modifier = Modifier.clickable {
-                        item.onClick.invoke()
-                    },
-                    headlineContent = {
-                        Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    },
-                    leadingContent = {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.title
-                        )
-                    },
-                )
-            }
-        }
-    }
-}
-
-data class BottomSheetItem(
-    val title: String = "",
-    val icon: ImageVector,
-    val onClick: () -> Unit
-)
 
 

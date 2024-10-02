@@ -45,7 +45,6 @@ fun LoginActivity(modifier: Modifier , navController: NavHostController) {
 
         )
 
-
         OutlinedTextField(
             value = password,
             onValueChange = {password = it},
