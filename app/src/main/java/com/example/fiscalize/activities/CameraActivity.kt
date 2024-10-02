@@ -93,6 +93,7 @@ fun CameraContent(
         }
     }
 
+    // Função para salvar a imagem na galeria para versões abaixo do Android 10
     fun saveImageToLegacyGallery(context: Context, uri: Uri) {
         val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         val file = File(picturesDir, "image_${System.currentTimeMillis()}.jpg")
@@ -105,6 +106,7 @@ fun CameraContent(
             outputStream.flush()
             outputStream.close()
 
+            // Notificar a galeria que uma nova imagem foi adicionada
             MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
 
             Toast.makeText(context, "Image saved to Photos!", Toast.LENGTH_SHORT).show()
@@ -114,6 +116,7 @@ fun CameraContent(
         }
     }
 
+    // Função para capturar a imagem e salvar na galeria
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { isSuccess ->
@@ -134,6 +137,7 @@ fun CameraContent(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
+            // Permission is granted, launch takePhotoLauncher
             val tmpUri = getTempUri(context, authority)
             tempUri.value = tmpUri
             takePhotoLauncher.launch(tempUri.value)
@@ -191,6 +195,7 @@ fun CameraContent(
 
 
 
+        //preview selfie
         uri?.let {
             Box(
                 modifier = Modifier.fillMaxWidth(),
