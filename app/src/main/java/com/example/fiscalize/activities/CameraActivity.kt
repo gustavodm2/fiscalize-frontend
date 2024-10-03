@@ -25,11 +25,45 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.fiscalize.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
+
+fun uploadImageToApi(context: Context, imageUri: Uri) {
+    val contentResolver = context.contentResolver
+    val file = File(imageUri.path ?: return)
+
+    val stream = ByteArrayOutputStream()
+    val byteArray = stream.toByteArray()
+    val multipartBody = MultipartBody.Part.createFormData(
+        "file", file.name,
+        byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull(), 0, byteArray.size)
+    )
+
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.uploadImage(multipartBody)
+            if (response.isSuccessful) {
+                Log.d("UPLOAD", "Imagem enviada com sucesso: $response")
+            } else {
+                Log.e("UPLOAD", "Erro no envio da imagem: $response")
+            }
+        } catch (e: Exception) {
+            Log.e("UPLOAD", "Falha na comunicação: ${e.message}")
+        }
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
@@ -39,9 +73,17 @@ fun CameraContent(
 ) {
     val context = LocalContext.current
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
-
+    Log.d("Image URI", capturedImageUri.toString())
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (!success) Toast.makeText(context, "Falha ao capturar a imagem", Toast.LENGTH_SHORT).show()
+        if (success) {
+            capturedImageUri?.let { uri ->
+                Log.d("Camera Capture", "Imagem capturada com sucesso: $uri")
+                uploadImageToApi(context, uri)
+            }
+        } else {
+            Log.e("Camera Capture", "Falha ao capturar a imagem")
+            Toast.makeText(context, "Falha ao capturar a imagem", Toast.LENGTH_SHORT).show()
+        }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -55,9 +97,12 @@ fun CameraContent(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
-
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
         Button(onClick = {
             if (ContextCompat.checkSelfPermission(
                     context,
@@ -78,27 +123,32 @@ fun CameraContent(
             Text("Tirar Foto")
         }
 
-
         capturedImageUri?.let { uri ->
-            Image(painter = rememberAsyncImagePainter(model = uri), contentDescription = null, modifier = Modifier.fillMaxWidth().height(200.dp))
+            Image(
+                painter = rememberAsyncImagePainter(model = uri),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
             Log.d("URI DA IMAGEM", uri.toString())
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
     }
 }
-
 @SuppressLint("SimpleDateFormat")
 fun createImageFileUri(context: Context): Uri? {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     val imageFileName = "JPEG_" + timeStamp + "_"
     val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    if (storageDir != null && !storageDir.exists()) {
+        storageDir.mkdirs()
+    }
+    Log.d("StorageDir", "Diretório: $storageDir")
     val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
     return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile)
 }
-
-
 
 
 
