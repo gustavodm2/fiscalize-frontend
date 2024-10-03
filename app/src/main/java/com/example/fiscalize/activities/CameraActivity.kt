@@ -86,6 +86,8 @@ fun CameraContent(
         }
     }
 
+    //content://com.example.fiscalize.provider/images/JPEG_20241003_161631_1120287572500085272.jpg
+
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions[Manifest.permission.CAMERA] == true) {
             capturedImageUri = createImageFileUri(context)
@@ -140,15 +142,17 @@ fun CameraContent(
 @SuppressLint("SimpleDateFormat")
 fun createImageFileUri(context: Context): Uri? {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
+    val imageFileName = "PNG_" + timeStamp + "_"
     val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     if (storageDir != null && !storageDir.exists()) {
         storageDir.mkdirs()
     }
     Log.d("StorageDir", "Diretório: $storageDir")
-    val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
+    // Criar arquivo PNG em vez de JPG
+    val imageFile = File.createTempFile(imageFileName, ".png", storageDir)
     return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile)
 }
+
 
 
 
