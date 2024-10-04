@@ -52,11 +52,13 @@ fun LoginActivity(modifier: Modifier , navController: NavHostController) {
         )
 
         Button(
-            onClick = { Toast.makeText(context, "Logando usuario", Toast.LENGTH_SHORT).show() } ,
+            onClick = { Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
+                      navController.navigate("home")},
             modifier = Modifier.padding(6.dp),
         ) {
             Text("Fazer login", color = Color.White)
         }
+
 
     }
 }

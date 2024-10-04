@@ -17,7 +17,7 @@ import com.example.fiscalize.activities.LoginActivity
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
-    NavHost( navController = navController, startDestination = "camera", builder = {
+    NavHost( navController = navController, startDestination = "login", builder = {
         composable("home") { HomeContent(modifier,navController) }
         composable("dashboard") {  DashboardActivity(modifier,navController) }
         composable("camera") { CameraContent(modifier,navController) }
