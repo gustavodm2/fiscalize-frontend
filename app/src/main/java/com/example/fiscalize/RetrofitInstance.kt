@@ -1,8 +1,9 @@
+import com.example.fiscalize.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val BASE_URL = "http://3.142.174.27:3000/"
+    private const val BASE_URL = BuildConfig.SERVER_IP
 
     val api: ApiService by lazy {
         Retrofit.Builder()

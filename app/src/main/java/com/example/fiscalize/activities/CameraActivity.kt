@@ -13,6 +13,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.content.MediaType
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -33,37 +34,79 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 
+
+fun compressImage(inputStream: InputStream, maxSizeKB: Int): ByteArray {
+    val bitmap = BitmapFactory.decodeStream(inputStream)
+    val outputStream = ByteArrayOutputStream()
+
+    var quality = 100
+    do {
+        outputStream.reset()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        quality -= 10
+    } while (outputStream.size() / 1024 > maxSizeKB && quality > 0)
+
+    return outputStream.toByteArray()
+}
 
 
 fun uploadImageToApi(context: Context, imageUri: Uri) {
     val contentResolver = context.contentResolver
-    val file = File(imageUri.path ?: return)
+    val inputStream = contentResolver.openInputStream(imageUri)
+    val compressedImageBytes = compressImage(inputStream!!, 500)
 
-    val stream = ByteArrayOutputStream()
-    val byteArray = stream.toByteArray()
-    val multipartBody = MultipartBody.Part.createFormData(
-        "file", file.name,
-        byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull(), 0, byteArray.size)
-    )
+    val maxBytes = 5 * 1024 * 1024
 
+    val buffer = ByteArrayOutputStream()
 
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val response = RetrofitInstance.api.uploadImage(multipartBody)
-            if (response.isSuccessful) {
-                Log.d("UPLOAD", "Imagem enviada com sucesso: $response")
-            } else {
-                Log.e("UPLOAD", "Erro no envio da imagem: $response")
+    try {
+        val byteArray = ByteArray(1024)
+        var totalBytesRead = 0
+        var len: Int
+
+        while (inputStream.read(byteArray).also { len = it } != -1 && totalBytesRead < maxBytes) {
+            if (totalBytesRead + len > maxBytes) {
+                len = maxBytes - totalBytesRead
             }
-        } catch (e: Exception) {
-            Log.e("UPLOAD", "Falha na comunicação: ${e.message}")
+
+            buffer.write(byteArray, 0, len)
+            totalBytesRead += len
         }
+
+
+
+        val requestBody = compressedImageBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+        val multipartBody = MultipartBody.Part.createFormData("file", "image.png", requestBody)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.api.uploadImage(multipartBody)
+
+                if (response.isSuccessful) {
+                    Log.d("UPLOAD", "Imagem enviada com sucesso: ${response}")
+
+                } else {
+                    Log.e("UPLOAD", "Erro no envio da imagem: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("UPLOAD", "Falha na comunicação: ${e.message}")
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("UPLOAD", "Erro ao processar imagem: ${e.message}")
+    } finally {
+        inputStream.close()
+        buffer.close()
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
@@ -86,7 +129,7 @@ fun CameraContent(
         }
     }
 
-    //content://com.example.fiscalize.provider/images/JPEG_20241003_161631_1120287572500085272.jpg
+
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions[Manifest.permission.CAMERA] == true) {
