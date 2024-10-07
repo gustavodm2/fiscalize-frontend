@@ -21,44 +21,111 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.TextFieldDefaults
+
 
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun LoginActivity(modifier: Modifier , navController: NavHostController) {
+fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostController) {
 
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+
 
     ) {
-        OutlinedTextField(
-            value = login,
-            onValueChange = {login = it},
-            label = { Text("Login")},
-            modifier = Modifier.padding(6.dp)
-
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = {password = it},
-            label = { Text("Senha")}
-        )
-
-        Button(
-            onClick = { Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
-                      navController.navigate("home")},
-            modifier = Modifier.padding(6.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text("Fazer login", color = Color.White)
+
+
+
+            OutlinedTextField(
+                value = login,
+                onValueChange = { login = it },
+                label = { Text("Login") },
+
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Login Icon"
+                    )
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF7F2627),
+                    cursorColor = Color(0xFF7F2627),
+                    focusedLabelColor = Color(0xFF7F2627),
+                    unfocusedLabelColor = Color(0xFF555555)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(10.dp),
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha") },
+
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Password Icon"
+                    )
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF7F2627),
+                    cursorColor = Color(0xFF7F2627),
+                    focusedLabelColor = Color(0xFF7F2627),
+                    unfocusedLabelColor = Color(0xFF555555)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(10.dp),
+            )
+
+            Button(
+                onClick = {
+                    Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show()
+                    navController.navigate("home")
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF7F2627)
+                ),
+                shape = RoundedCornerShape(50),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Fazer Login",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
-
-
     }
 }
