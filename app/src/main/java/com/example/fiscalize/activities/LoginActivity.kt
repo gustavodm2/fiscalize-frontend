@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.fiscalize.R
 import com.example.fiscalize.ui.theme.appGray
+import com.example.fiscalize.ui.theme.mainRed
+import com.example.fiscalize.ui.theme.offWhite
 import com.example.fiscalize.ui.theme.primary
 
 
@@ -55,7 +57,7 @@ fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostControlle
 
 
     Box(
-        Modifier.background(color = appGray)
+        Modifier.background(color = offWhite)
     ){
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -66,7 +68,9 @@ fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostControlle
 
             Image(
                 painter = painterResource(R.drawable.logo),
-                contentDescription = "App Logo"
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(250.dp)
             )
             OutlinedTextField(
                 value = login,
@@ -118,7 +122,7 @@ fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostControlle
                           navController.navigate("home")},
                 modifier = Modifier.padding(6.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = primary
+                    containerColor = mainRed
                 )
             ) {
                 Text("Fazer login", color = Color.White)
