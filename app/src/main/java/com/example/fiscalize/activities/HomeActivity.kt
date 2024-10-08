@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,7 @@ fun HomeContent(
 ) {
     val context = LocalContext.current
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
@@ -56,6 +58,13 @@ fun HomeContent(
             }
         } else {
             Toast.makeText(context, "Falha ao capturar a imagem", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            capturedImageUri = it
+            uploadImageToApi(context, it)
         }
     }
 
@@ -110,16 +119,7 @@ fun HomeContent(
 
         Button(
             colors = mainButtonColor,
-            onClick = {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    capturedImageUri = createImageFileUri(context)
-                    capturedImageUri?.let { uri -> cameraLauncher.launch(uri) }
-                } else {
-                    permissionLauncher.launch(
-                        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    )
-                }
-            },
+            onClick = { showDialog = true }, // Mostra o modal para escolher a ação
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
@@ -127,15 +127,38 @@ fun HomeContent(
             Text("+", color = Color.White, fontSize = 25.sp)
         }
 
-        capturedImageUri?.let { uri ->
-            Image(
-                painter = rememberAsyncImagePainter(model = uri),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = "Escolher ação") },
+                text = { Text(text = "Deseja tirar uma foto ou escolher uma da galeria?") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDialog = false
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            capturedImageUri = createImageFileUri(context)
+                            capturedImageUri?.let { uri -> cameraLauncher.launch(uri) }
+                        } else {
+                            permissionLauncher.launch(
+                                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            )
+                        }
+                    }) {
+                        Text("Tirar Foto")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        showDialog = false
+                        galleryLauncher.launch("image/*")
+                    }) {
+                        Text("Escolher da Galeria")
+                    }
+                }
             )
         }
+
+
     }
 }
 
