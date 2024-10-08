@@ -6,14 +6,22 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -39,61 +47,82 @@ import com.example.fiscalize.ui.theme.primary
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun LoginActivity(modifier: Modifier , navController: NavHostController) {
+fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostController) {
 
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = appGray),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
 
-    ) {
-        Card(
-            modifier = Modifier.size(300.dp),
-
+    Box(
+        Modifier.background(color = appGray)
+    ){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
 
         ) {
+
             Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "App Logo"
             )
-        }
-
-        OutlinedTextField(
-            value = login,
-            onValueChange = {login = it},
-            label = { Text("Login")},
-            modifier = Modifier.padding(6.dp)
-
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = {password = it},
-            label = { Text("Senha")}
-        )
-
-        Button(
-            onClick = { Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
-                      navController.navigate("home")},
-            modifier = Modifier
-                .padding(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = primary
+            OutlinedTextField(
+                value = login,
+                onValueChange = { login = it },
+                label = { Text("Login") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Login Icon"
+                    )
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF7F2627),
+                    cursorColor = Color(0xFF7F2627),
+                    focusedLabelColor = Color(0xFF7F2627),
+                    unfocusedLabelColor = Color(0xFF555555)
+                ),
+                modifier = Modifier
+                    .width(350.dp)
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(10.dp),
             )
 
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Senha") },
 
-        ) {
-            Text("Fazer login", color = Color.White)
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Password Icon"
+                        )
+                    },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF7F2627),
+                        cursorColor = Color(0xFF7F2627),
+                        focusedLabelColor = Color(0xFF7F2627),
+                        unfocusedLabelColor = Color(0xFF555555)
+                    ),
+                    modifier = Modifier
+                        .width(350.dp)
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(10.dp),
+                )
+
+            Button(
+                onClick = { Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
+                          navController.navigate("home")},
+                modifier = Modifier.padding(6.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = primary
+                )
+            ) {
+                Text("Fazer login", color = Color.White)
+            }
         }
-
-
     }
 }
