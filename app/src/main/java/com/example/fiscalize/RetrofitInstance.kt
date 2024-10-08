@@ -1,3 +1,4 @@
+import com.example.fiscalize.ApiService
 import com.example.fiscalize.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
