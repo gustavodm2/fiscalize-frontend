@@ -1,44 +1,45 @@
-package com.example.fiscalize.activities
+package com.example.fiscalize.views
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import com.example.fiscalize.createImageFileUri
-import com.example.fiscalize.uploadImageToApi
+import com.example.fiscalize.R
+import com.example.fiscalize.viewModel.createImageFileUri
+import com.example.fiscalize.ui.theme.mainRed
+import com.example.fiscalize.viewModel.uploadImageToApi
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -93,33 +94,119 @@ fun HomeContent(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = "Bem vindo, Roberto", fontSize = 20.sp, fontStyle = FontStyle.Italic)
-            Spacer(Modifier.padding(8.dp))
-
-            LazyColumn(
+            Card(
                 modifier = Modifier
+                    .padding(16.dp)
                     .fillMaxWidth()
-                    .weight(0.5f)
-                    .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
-                    .padding(8.dp)
+                    .height(120.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                border = BorderStroke(1.dp, Color.LightGray),
             ) {
-                items(listOf("ICMS", "CFOP", "NCM")) { item ->
-                    Box(
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Logo Image
+                    Image(
+                        painter = painterResource(R.drawable.logo),
+                        contentDescription = "App Logo",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(4.dp)
-                            .border(1.dp, Color.Black)
-                            .padding(8.dp)
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Gray, CircleShape)
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+
+                    Column(
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = item, fontSize = 20.sp)
+                        Text(
+                            text = "Razão Social: J&V",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 16.sp,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = Color(0xFF333333)
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "CNPJ: 111.222.333-44",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = Color(0xFF777777)
+                        )
                     }
                 }
             }
+            Spacer(Modifier.padding(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { navController.navigate("taxes")  },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = mainRed,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = "Impostos",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Button(
+                    onClick = {  },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = mainRed,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = "Folha de pagamento",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            Spacer(Modifier.padding(8.dp))
+
+
+
         }
 
         Button(
             colors = mainButtonColor,
-            onClick = { showDialog = true }, // Mostra o modal para escolher a ação
+            onClick = { showDialog = true }, 
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)

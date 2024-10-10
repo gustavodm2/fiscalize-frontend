@@ -12,3 +12,5 @@ val Pink40 = Color(0xFF7D5260)
 
 val appGray = Color(0xFFDEDEDE)
 val primary = Color(0xFF374151)
+val offWhite = Color(0xFFfcf6f8)
+val mainRed = Color(0xFF7F2627)

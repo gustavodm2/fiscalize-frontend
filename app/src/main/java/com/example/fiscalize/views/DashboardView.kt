@@ -1,4 +1,4 @@
-package com.example.fiscalize.activities
+package com.example.fiscalize.views
 
 import android.os.Build
 import androidx.annotation.RequiresApi

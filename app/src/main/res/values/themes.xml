@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/gray</item>
+        <item name="windowSplashScreenBackground">@color/offwhite</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/resized_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.Fiscalize</item>
     </style>

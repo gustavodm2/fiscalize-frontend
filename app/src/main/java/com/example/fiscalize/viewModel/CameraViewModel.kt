@@ -1,4 +1,4 @@
-package com.example.fiscalize
+package com.example.fiscalize.viewModel
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,6 +8,8 @@ import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.example.fiscalize.BuildConfig
+import com.example.fiscalize.model.api.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
