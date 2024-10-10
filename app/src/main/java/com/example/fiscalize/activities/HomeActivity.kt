@@ -106,78 +106,69 @@ fun HomeContent(
         ) {
             Card(
                 modifier = Modifier
-                    .size(width = 380.dp, height = 100.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 8.dp),
-
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 6.dp
-                ),
-                border = BorderStroke(1.dp, Color.Black)
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(120.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                border = BorderStroke(1.dp, Color.LightGray),
             ) {
                 Row(
                     modifier = Modifier
-
-
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Logo Image
                     Image(
                         painter = painterResource(R.drawable.logo),
                         contentDescription = "App Logo",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(50.dp))
-                            .size(88.dp)
-                            .clip(CircleShape),
-                        )
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Gray, CircleShape)
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Text Column
                     Column(
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                    ){
-                        val corporateReason = "J&V"
-                        val CNPJ = "111.222.333-44"
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = "Razão Social: $corporateReason",
-                            fontSize = 20.sp,
-                            fontStyle = FontStyle.Italic,
-                            textAlign = TextAlign.Center
+                            text = "Razão Social: J&V",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 16.sp,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = Color(0xFF333333)
                         )
 
+                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
-                            text = "CNPJ: $CNPJ",
-                            fontSize = 20.sp,
-                            fontStyle = FontStyle.Italic,
-                            textAlign = TextAlign.Center
+                            text = "CNPJ: 111.222.333-44",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = Color(0xFF777777)
                         )
                     }
                 }
-
             }
             Spacer(Modifier.padding(8.dp))
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.5f)
-                    .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
-                    .padding(8.dp)
-            ) {
-                items(listOf("ICMS", "CFOP", "NCM")) { item ->
-                    Box(
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(4.dp)
-                            .border(1.dp, Color.Black)
-                            .padding(8.dp)
-                    ) {
-                        Text(text = item, fontSize = 20.sp)
-                    }
-                }
-            }
+
+
+
         }
 
         Button(
             colors = mainButtonColor,
-            onClick = { showDialog = true }, // Mostra o modal para escolher a ação
+            onClick = { showDialog = true }, 
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
