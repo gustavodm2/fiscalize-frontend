@@ -49,6 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.fiscalize.R
 import com.example.fiscalize.createImageFileUri
 import com.example.fiscalize.ui.theme.appGray
+import com.example.fiscalize.ui.theme.mainRed
 import com.example.fiscalize.uploadImageToApi
 
 
@@ -133,7 +134,7 @@ fun HomeContent(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Text Column
+
                     Column(
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -161,6 +162,54 @@ fun HomeContent(
             }
             Spacer(Modifier.padding(8.dp))
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { navController.navigate("taxes")  },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = mainRed,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = "Impostos",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Button(
+                    onClick = {  },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = mainRed,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = "Folha de pagamento",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            Spacer(Modifier.padding(8.dp))
 
 
 

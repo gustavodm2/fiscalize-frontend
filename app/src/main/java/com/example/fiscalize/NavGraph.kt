@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fiscalize.activities.DashboardActivity
 import com.example.fiscalize.activities.HomeContent
 import com.example.fiscalize.activities.LoginActivity
+import com.example.fiscalize.activities.TaxesActivity
 import com.example.fiscalize.ui.theme.mainRed
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -27,8 +28,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost( navController = navController, startDestination = "login", builder = {
         composable("home") { HomeContent(modifier,navController) }
         composable("dashboard") {  DashboardActivity(modifier,navController) }
-
         composable("login") { LoginActivity(modifier,navController) }
+        composable("taxes") { TaxesActivity(modifier,navController) }
+
     })
 
 }
