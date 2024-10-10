@@ -15,6 +15,7 @@ import com.example.fiscalize.views.TaxesActivity
 import com.example.fiscalize.ui.theme.mainRed
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {

@@ -171,7 +171,7 @@ fun HomeContent(
                         .height(100.dp)
                 ) {
                     Text(
-                        text = "Impostos",
+                        text = "Simples Nacional",
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
                     )

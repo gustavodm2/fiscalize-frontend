@@ -93,4 +93,6 @@ dependencies {
     implementation(libs.converter.scalars)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.mpandroidchart)
+    implementation(libs.androidx.espresso.core.v361)
 }
