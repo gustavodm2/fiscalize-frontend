@@ -1,4 +1,4 @@
-package com.example.fiscalize.views
+package com.example.fiscalize.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -178,7 +178,7 @@ fun HomeContent(
                 }
 
                 Button(
-                    onClick = {  },
+                    onClick = {  navController.navigate("dashboard")},
                     colors = ButtonDefaults.buttonColors(
                         containerColor = mainRed,
                         contentColor = Color.White

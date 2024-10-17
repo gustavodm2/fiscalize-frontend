@@ -1,4 +1,4 @@
-package com.example.fiscalize.views
+package com.example.fiscalize.activities
 
 import android.os.Build
 import android.widget.Toast

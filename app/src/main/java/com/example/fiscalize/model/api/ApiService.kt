@@ -1,7 +1,9 @@
 package com.example.fiscalize.model.api
 
+import com.example.fiscalize.model.documents.SimplesModel
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -18,8 +20,6 @@ interface ApiService {
 
 
     @GET("/document")
-    suspend fun getDocuments(
-        @Query("id") documentId: Int
-    ): Response<ResponseBody>
+    suspend fun getDocuments() : Response<List<SimplesModel>>
 
 }

@@ -1,9 +1,8 @@
-package com.example.fiscalize.views
+package com.example.fiscalize.activities
 
-import android.os.Build
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,11 +29,13 @@ import com.example.fiscalize.viewModel.updatePieChartWithData
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 
-@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun TaxesActivity(modifier: Modifier = Modifier, navController: NavHostController){
+fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostController){
      // on below line we are creating a
      // pie chart function on below line.
+
+
 
      val context = LocalContext.current
           // on below line we are creating a column

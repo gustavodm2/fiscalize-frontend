@@ -6,5 +6,6 @@ data class Tax(
     val principal: String,
     val fine: String,
     val fees: String,
-    val total: String
+    val total: String,
+    val _id: String
 )
