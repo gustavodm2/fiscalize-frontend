@@ -35,8 +35,6 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
      // on below line we are creating a
      // pie chart function on below line.
 
-
-
      val context = LocalContext.current
           // on below line we are creating a column
           // and specifying a modifier as max size.

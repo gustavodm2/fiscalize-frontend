@@ -158,7 +158,7 @@ fun HomeContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { navController.navigate("taxes")  },
+                    onClick = { navController.navigate("main")  },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = mainRed,
                         contentColor = Color.White

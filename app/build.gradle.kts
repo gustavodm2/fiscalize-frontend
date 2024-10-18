@@ -87,7 +87,6 @@ dependencies {
     implementation(libs.androidx.core.ktx.v1120)
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.core)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.converter.scalars)
@@ -95,4 +94,10 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.espresso.core.v361)
+
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.v171)
+    implementation(libs.kotlinx.serialization.json)
+
 }
