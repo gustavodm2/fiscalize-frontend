@@ -23,6 +23,7 @@ class SimplesViewModel : ViewModel() {
                  if (response.isSuccessful) {
                      response.body()?.let { responseList ->
                          simplesNacional = responseList
+                         Log.d("simples", "${simplesNacional.size}")
                      }
                  }
              } catch (e: Exception) {

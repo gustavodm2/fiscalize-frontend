@@ -8,7 +8,7 @@ data class SimplesModel(
     val calculationPeriod: String,
     val documentNumber: String,
     val observations: String,
-    val taxes:List<Tax>
+    val taxes:List<TaxModel>
 )
 
 

@@ -1,6 +1,7 @@
 package com.example.fiscalize.activities
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,7 @@ fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostControl
 
     val simplesViewModel: SimplesViewModel = viewModel()
     val simplesDocument = simplesViewModel.simplesNacional
+
 
     LaunchedEffect(Unit) {
         simplesViewModel.getDocuments()

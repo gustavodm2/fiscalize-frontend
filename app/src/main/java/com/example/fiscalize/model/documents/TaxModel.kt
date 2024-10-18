@@ -1,6 +1,6 @@
 package com.example.fiscalize.model.documents
 
-data class Tax(
+data class TaxModel(
     val code: String,
     val denomination: String,
     val principal: String,

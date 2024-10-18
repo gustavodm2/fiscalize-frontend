@@ -1,6 +1,7 @@
 package com.example.fiscalize.activities
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.compose.animation.Crossfade
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,12 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.fiscalize.R
-import com.example.fiscalize.model.getPieChartData
-import com.example.fiscalize.viewModel.updatePieChartWithData
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
+import com.example.fiscalize.viewModel.SimplesViewModel
+import com.example.fiscalize.viewModel.updatePieChartWithData
+
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -35,7 +39,17 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
      // on below line we are creating a
      // pie chart function on below line.
 
+
+     val simplesViewModel: SimplesViewModel = viewModel()
+     val simplesDocument = simplesViewModel.simplesNacional
      val context = LocalContext.current
+
+
+     LaunchedEffect(Unit) {
+          simplesViewModel.getDocuments()
+     }
+
+     Log.d("simplesdocaralho","${simplesDocument}")
           // on below line we are creating a column
           // and specifying a modifier as max size.
           Column(modifier = Modifier.fillMaxSize()) {
@@ -82,7 +96,7 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                          // on below line we are creating a cross fade and
                          // specifying target state as pie chart data the
                          // method we have created in Pie chart data class.
-                         Crossfade(targetState = getPieChartData) { pieChartData ->
+                         Crossfade(targetState = simplesDocument) { pieChartData ->
                               // on below line we are creating an
                               // android view for pie chart.
                               AndroidView(factory = { context ->
