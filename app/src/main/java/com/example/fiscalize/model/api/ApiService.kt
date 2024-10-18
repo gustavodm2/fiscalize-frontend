@@ -13,13 +13,13 @@ import retrofit2.http.Query
 
 interface ApiService {
     @Multipart
-    @POST("/image")
+    @POST("/images")
     suspend fun uploadImage(
         @Part image: MultipartBody.Part
     ): Response<ResponseBody>
 
 
-    @GET("/document")
+    @GET("/documents")
     suspend fun getDocuments() : Response<List<SimplesModel>>
 
 }

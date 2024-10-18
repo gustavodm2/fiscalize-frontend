@@ -26,7 +26,7 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController) {
+fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, simplesViewModel: SimplesViewModel) {
 
     val simplesViewModel: SimplesViewModel = viewModel()
     val simplesDocument = simplesViewModel.simplesNacional
@@ -56,7 +56,7 @@ fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostControl
             }
         }
         items(simplesDocument) { doc ->
-            SimplesCard(doc)
+            SimplesCard(doc, navController, simplesViewModel)
         }
     }
 }

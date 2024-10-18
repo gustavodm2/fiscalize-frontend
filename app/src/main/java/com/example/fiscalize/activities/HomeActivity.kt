@@ -44,7 +44,7 @@ import com.example.fiscalize.viewModel.uploadImageToApi
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HomeContent(
+fun HomeActivity(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {

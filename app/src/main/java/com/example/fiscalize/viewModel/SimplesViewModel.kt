@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fiscalize.model.api.RetrofitInstance
@@ -31,4 +33,11 @@ class SimplesViewModel : ViewModel() {
              }
          }
      }
+
+    private val _selectedDocument = MutableLiveData<SimplesModel?>(null)
+    val selectedDocument: LiveData<SimplesModel?> = _selectedDocument
+
+    fun updateSelectedTvShow(simplesModel: SimplesModel) {
+        _selectedDocument.value = simplesModel
+    }
 }

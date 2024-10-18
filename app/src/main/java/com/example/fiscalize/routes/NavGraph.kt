@@ -11,23 +11,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fiscalize.activities.HistoryActivity
-import com.example.fiscalize.activities.HomeContent
 import com.example.fiscalize.activities.LoginActivity
 import com.example.fiscalize.activities.SimplesActivity
 import com.example.fiscalize.ui.theme.mainRed
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.fiscalize.activities.DocDetailActivity
+import com.example.fiscalize.activities.HomeActivity
+import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.viewModel.SimplesViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -41,8 +39,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     )
 
     NavHost(navController = navController, startDestination = "login", builder = {
-        composable("home") { HomeContent(modifier, navController) }
+        composable("home") { HomeActivity(modifier, navController) }
         composable("login") { LoginActivity(modifier, navController) }
+
         navigation(startDestination = "dashboard", route = "main") {
             composable("dashboard") {
                 BottomTabNavigation(modifier)
@@ -50,6 +49,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             composable("taxes") {
                 SimplesActivity(modifier, navController)
             }
+            composable("docDetail") { DocDetailActivity(modifier, navController, viewModel = SimplesViewModel()) }
         }
     })
 }
@@ -74,7 +74,7 @@ fun BottomTabNavigation(modifier: Modifier = Modifier) {
             startDestination = tabs[0].route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("dashboard") { HistoryActivity(modifier, navController) }
+            composable("dashboard") { HistoryActivity(modifier, navController, simplesViewModel = SimplesViewModel()) }
             composable("taxes") { SimplesActivity(modifier, navController) }
         }
     }
