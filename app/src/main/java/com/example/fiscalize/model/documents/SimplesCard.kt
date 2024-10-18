@@ -16,21 +16,24 @@ import androidx.navigation.NavController
 import com.example.fiscalize.viewModel.SimplesViewModel
 
 @Composable
-fun SimplesCard(document: SimplesModel, navController: NavController, simplesViewModel: SimplesViewModel) {
+fun SimplesCard(document: SimplesModel, navController: NavController, simplesViewModel: SimplesViewModel, mainHost: NavController) {
+    //navControler => host da tabNavigation
+    //mainHost => host default
+
     Card(
         Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .height(64.dp)
             .clickable {
-                navController.navigate("docDetail")
+                mainHost.navigate("docDetail")
                 simplesViewModel.updateSelectedTvShow(document)
             },
 
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(){
+        Row{
             Text(
                 document.calculationPeriod,
                 modifier = Modifier

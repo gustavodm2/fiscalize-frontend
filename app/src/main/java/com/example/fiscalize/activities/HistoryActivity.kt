@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.fiscalize.model.documents.SimplesCard
 import com.example.fiscalize.viewModel.SimplesViewModel
@@ -26,7 +27,7 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, simplesViewModel: SimplesViewModel) {
+fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController) {
 
     val simplesViewModel: SimplesViewModel = viewModel()
     val simplesDocument = simplesViewModel.simplesNacional
@@ -56,7 +57,7 @@ fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostControl
             }
         }
         items(simplesDocument) { doc ->
-            SimplesCard(doc, navController, simplesViewModel)
+            SimplesCard(doc, navController, simplesViewModel, mainHost)
         }
     }
 }

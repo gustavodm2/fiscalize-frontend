@@ -41,22 +41,22 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "login", builder = {
         composable("home") { HomeActivity(modifier, navController) }
         composable("login") { LoginActivity(modifier, navController) }
+        composable("docDetail") { DocDetailActivity(modifier, navController, viewModel = SimplesViewModel()) }
 
         navigation(startDestination = "dashboard", route = "main") {
             composable("dashboard") {
-                BottomTabNavigation(modifier)
+                BottomTabNavigation(modifier, navController)
             }
             composable("taxes") {
                 SimplesActivity(modifier, navController)
             }
-            composable("docDetail") { DocDetailActivity(modifier, navController, viewModel = SimplesViewModel()) }
         }
     })
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun BottomTabNavigation(modifier: Modifier = Modifier) {
+fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController) {
     val navController = rememberNavController()
 
     val tabs = listOf(
@@ -74,7 +74,7 @@ fun BottomTabNavigation(modifier: Modifier = Modifier) {
             startDestination = tabs[0].route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("dashboard") { HistoryActivity(modifier, navController, simplesViewModel = SimplesViewModel()) }
+            composable("dashboard") { HistoryActivity(modifier, navController, mainHost) }
             composable("taxes") { SimplesActivity(modifier, navController) }
         }
     }
