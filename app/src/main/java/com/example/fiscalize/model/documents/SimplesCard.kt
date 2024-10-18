@@ -35,7 +35,8 @@ fun SimplesCard(document: SimplesModel, navController: NavController, simplesVie
     ) {
         Row{
             Text(
-                document.calculationPeriod,
+                "${document.calculationPeriod}\n" +
+                        "${document.documentNumber}",
                 modifier = Modifier
                     .padding(8.dp)
             )

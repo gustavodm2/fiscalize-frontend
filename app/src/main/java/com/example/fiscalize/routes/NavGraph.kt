@@ -62,8 +62,8 @@ fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController, 
     val navController = rememberNavController()
 
     val tabs = listOf(
-        BottomNavItem("Dashboard", "dashboard", com.example.fiscalize.R.drawable.ic_dashboard),
-        BottomNavItem("Taxes", "taxes", com.example.fiscalize.R.drawable.ic_history)
+        BottomNavItem("Histórico", "dashboard", com.example.fiscalize.R.drawable.ic_history),
+        BottomNavItem("Gráfico", "taxes", com.example.fiscalize.R.drawable.ic_dashboard)
     )
 
     Scaffold(

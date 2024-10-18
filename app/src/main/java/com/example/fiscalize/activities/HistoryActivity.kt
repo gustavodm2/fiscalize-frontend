@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -48,9 +49,10 @@ fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostControl
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Documento",
-                    style = MaterialTheme.typography.h3
+                androidx.compose.material3.Text(
+                    text = "Histórico de documentos",
+                    style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
