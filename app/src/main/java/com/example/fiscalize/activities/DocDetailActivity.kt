@@ -33,7 +33,7 @@ fun DocDetailActivity(
                 text = "Detalhes do Documento",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+
             )
 
             Spacer(modifier = Modifier.height(24.dp))
