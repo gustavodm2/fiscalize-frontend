@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +34,7 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 fun AppNavigation(modifier: Modifier = Modifier) {
     val systemUiController = rememberSystemUiController()
     val navController = rememberNavController()
+    val simplesViewModel: SimplesViewModel = viewModel()
 
     systemUiController.setStatusBarColor(
         color = mainRed
@@ -41,11 +43,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "login", builder = {
         composable("home") { HomeActivity(modifier, navController) }
         composable("login") { LoginActivity(modifier, navController) }
-        composable("docDetail") { DocDetailActivity(modifier, navController, viewModel = SimplesViewModel()) }
+        composable("docDetail") { DocDetailActivity(modifier, navController, simplesViewModel) }
 
         navigation(startDestination = "dashboard", route = "main") {
             composable("dashboard") {
-                BottomTabNavigation(modifier, navController)
+                BottomTabNavigation(modifier, navController, simplesViewModel)
             }
             composable("taxes") {
                 SimplesActivity(modifier, navController)
@@ -56,7 +58,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController) {
+fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController, simplesViewModel: SimplesViewModel) {
     val navController = rememberNavController()
 
     val tabs = listOf(
@@ -74,7 +76,7 @@ fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController) 
             startDestination = tabs[0].route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("dashboard") { HistoryActivity(modifier, navController, mainHost) }
+            composable("dashboard") { HistoryActivity(modifier, navController, mainHost, simplesViewModel) }
             composable("taxes") { SimplesActivity(modifier, navController) }
         }
     }

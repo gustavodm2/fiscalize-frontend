@@ -27,11 +27,9 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController) {
+fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController, simplesViewModel: SimplesViewModel) {
 
-    val simplesViewModel: SimplesViewModel = viewModel()
     val simplesDocument = simplesViewModel.simplesNacional
-
 
     LaunchedEffect(Unit) {
         simplesViewModel.getDocuments()

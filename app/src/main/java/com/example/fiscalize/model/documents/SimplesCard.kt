@@ -26,8 +26,8 @@ fun SimplesCard(document: SimplesModel, navController: NavController, simplesVie
             .padding(8.dp)
             .height(64.dp)
             .clickable {
-                mainHost.navigate("docDetail")
                 simplesViewModel.updateSelectedTvShow(document)
+                mainHost.navigate("docDetail")
             },
 
         shape = RoundedCornerShape(8.dp),

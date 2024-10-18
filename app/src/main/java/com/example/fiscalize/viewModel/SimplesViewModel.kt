@@ -34,10 +34,9 @@ class SimplesViewModel : ViewModel() {
          }
      }
 
-    private val _selectedDocument = MutableLiveData<SimplesModel?>(null)
-    val selectedDocument: LiveData<SimplesModel?> = _selectedDocument
+     var selectedDocument by mutableStateOf<SimplesModel?>(null)
 
     fun updateSelectedTvShow(simplesModel: SimplesModel) {
-        _selectedDocument.value = simplesModel
+        selectedDocument = simplesModel
     }
 }
