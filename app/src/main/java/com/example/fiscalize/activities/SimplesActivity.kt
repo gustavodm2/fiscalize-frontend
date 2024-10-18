@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.fiscalize.R
+import com.example.fiscalize.model.getPieChartData
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import com.example.fiscalize.viewModel.SimplesViewModel
@@ -96,7 +97,7 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                          // on below line we are creating a cross fade and
                          // specifying target state as pie chart data the
                          // method we have created in Pie chart data class.
-                         Crossfade(targetState = simplesDocument) { pieChartData ->
+                         Crossfade(targetState = getPieChartData) { pieChartData ->
                               // on below line we are creating an
                               // android view for pie chart.
                               AndroidView(factory = { context ->

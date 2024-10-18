@@ -22,7 +22,7 @@ import kotlin.random.Random
 
 fun updatePieChartWithData(
     chart: PieChart,
-    data: List<SimplesModel>,
+    data: List<PieChartData>,
     context: Context
 ) {
 
@@ -32,14 +32,11 @@ fun updatePieChartWithData(
 
 
 
-    for (simplesModel in data) {
-        for (tax in simplesModel.taxes) {
-            val totalValue = tax.total.toFloatOrNull() ?: 0f
-            val denomination = tax.denomination ?: "Unknown" // Handle null denomination
-            entries.add(PieEntry(totalValue, denomination))
-        }
+    for (i in data.indices) {
+        val item = data[i]
+        entries.add(PieEntry(item.value ?: 0.toFloat(), item.browserName ?: ""))
     }
-            Log.d("test", "${data}")
+
 
 
     val ds = PieDataSet(entries, "")
