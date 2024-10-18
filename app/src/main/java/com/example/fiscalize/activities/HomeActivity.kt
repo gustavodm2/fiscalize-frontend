@@ -230,7 +230,11 @@ fun HomeActivity(
                                 arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             )
                         }
-                    }) {
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = mainRed,
+                            contentColor = Color.White
+                        ),) {
                         Text("Tirar Foto")
                     }
                 },
@@ -238,7 +242,11 @@ fun HomeActivity(
                     Button(onClick = {
                         showDialog = false
                         galleryLauncher.launch("image/*")
-                    }) {
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = mainRed,
+                            contentColor = Color.White
+                        ),) {
                         Text("Escolher da Galeria")
                     }
                 }
