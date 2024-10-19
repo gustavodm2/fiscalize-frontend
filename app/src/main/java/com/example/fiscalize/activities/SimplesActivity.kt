@@ -64,7 +64,7 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                     // on below line we are creating a simple text
                     // and specifying a text as Web browser usage share
                     Text(
-                         text = "Web Browser Usage Share",
+                         text = "Impostos",
 
                          // on below line we are specifying style for our text
                          style = TextStyle(

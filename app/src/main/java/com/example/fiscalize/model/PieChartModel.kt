@@ -6,8 +6,8 @@ data class PieChartData(
 )
 
 val getPieChartData = listOf(
-    PieChartData("Chrome", 34.68F),
-    PieChartData("Firefox", 16.60F),
-    PieChartData("Safari", 16.15F),
-    PieChartData("Internet Explorer", 15.62F),
+    PieChartData("ICMS", 11.98F),
+    PieChartData("INSS", 129.14F),
+    PieChartData("IRPJ", 16.15F),
+    PieChartData("CSLL", 15.62F),
 )
