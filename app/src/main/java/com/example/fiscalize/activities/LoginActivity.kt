@@ -1,6 +1,7 @@
 package com.example.fiscalize.activities
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,16 +39,18 @@ import androidx.navigation.NavHostController
 import com.example.fiscalize.R
 import com.example.fiscalize.ui.theme.mainRed
 import com.example.fiscalize.ui.theme.offWhite
+import com.example.fiscalize.viewModel.LoginViewModel
+import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostController) {
+fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostController, loginViewModel: LoginViewModel) {
 
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
-
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         Modifier.background(color = offWhite)
@@ -110,8 +114,17 @@ fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostControlle
                 )
 
             Button(
-                onClick = { Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
-                          navController.navigate("home")},
+                onClick = {
+                    coroutineScope.launch {
+                        try {
+                            loginViewModel.loginUser(login, password, context)
+                            Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show()
+                            navController.navigate("home")
+                        } catch (e: Exception) {
+                            e.message?.let { Log.e("login", it) }
+                        }
+                    }
+                },
                 modifier = Modifier.padding(6.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = mainRed

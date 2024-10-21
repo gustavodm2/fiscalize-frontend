@@ -26,6 +26,7 @@ import androidx.navigation.navigation
 import com.example.fiscalize.activities.DocDetailActivity
 import com.example.fiscalize.activities.HomeActivity
 import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.viewModel.LoginViewModel
 import com.example.fiscalize.viewModel.SimplesViewModel
 
 
@@ -35,6 +36,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val systemUiController = rememberSystemUiController()
     val navController = rememberNavController()
     val simplesViewModel: SimplesViewModel = viewModel()
+    val loginViewModel: LoginViewModel = viewModel()
 
     systemUiController.setStatusBarColor(
         color = mainRed
@@ -42,7 +44,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     NavHost(navController = navController, startDestination = "login", builder = {
         composable("home") { HomeActivity(modifier, navController) }
-        composable("login") { LoginActivity(modifier, navController) }
+        composable("login") { LoginActivity(modifier, navController, loginViewModel) }
         composable("docDetail") { DocDetailActivity(modifier, navController, simplesViewModel) }
 
         navigation(startDestination = "dashboard", route = "main") {
