@@ -2,10 +2,7 @@ package com.example.fiscalize.viewModel
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Typeface
-import com.example.fiscalize.model.PieChartData
 import com.example.fiscalize.model.documents.FilteredTaxes
-import com.example.fiscalize.model.documents.SimplesModel
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -17,38 +14,31 @@ fun updatePieChartWithData(
     data: List<FilteredTaxes>,
     context: Context
 ) {
-
     val entries = ArrayList<PieEntry>()
+    val colors = ArrayList<Int>()
 
-    for (simplesModel in data) {
-            val totalValue = simplesModel.total
-            val denomination = simplesModel.denomination.split(" ")[0]
-            entries.add(PieEntry(totalValue, denomination))
+    for (tax in data) {
+        val totalValue = tax.total
+        val denomination = tax.denomination.split(" ")[0]
+        entries.add(PieEntry(totalValue, denomination))
+        colors.add(tax.color)
     }
 
     val ds = PieDataSet(entries, "")
+    ds.colors = colors
+    ds.setDrawValues(false) // Não exibe os valores nas fatias
 
-    val randomColors = entries.map { getRandomColor() }
-    ds.colors = ArrayList(randomColors)
-
-    ds.setDrawValues(false)
-
-
-    ds.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
-    ds.xValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
-    ds.sliceSpace = 2f
-    ds.valueTextSize = 18f
-    ds.valueTypeface = Typeface.DEFAULT_BOLD
+    // Desabilita a posição dos valores nas fatias
+    ds.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+    ds.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
 
     val pieData = PieData(ds)
     chart.data = pieData
+
+    // Não exibe os rótulos nas fatias
+    chart.setDrawEntryLabels(false)
+
     chart.invalidate()
-
-
-
 }
 
-private fun getRandomColor(): Int {
-    val random = Random
-    return Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256))
-}
+
