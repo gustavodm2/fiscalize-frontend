@@ -42,51 +42,39 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
 
 
      val simplesViewModel: SimplesViewModel = viewModel()
+     val filteredTaxes = simplesViewModel.filteredTaxes
      val simplesDocument = simplesViewModel.simplesNacional
      val context = LocalContext.current
 
 
      LaunchedEffect(Unit) {
+          simplesViewModel.filterDocuments()
           simplesViewModel.getDocuments()
      }
 
-     Log.d("simplesdocaralho","${simplesDocument}")
-          // on below line we are creating a column
-          // and specifying a modifier as max size.
+
+     Log.d("graf", "$filteredTaxes")
+     Log.d("graf", "$simplesDocument")
+
           Column(modifier = Modifier.fillMaxSize()) {
-               // on below line we are again creating a column
-               // with modifier and horizontal and vertical arrangement
                Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                ) {
-                    // on below line we are creating a simple text
-                    // and specifying a text as Web browser usage share
                     Text(
                          text = "Impostos",
-
-                         // on below line we are specifying style for our text
                          style = TextStyle(
                               fontFamily = FontFamily.Default,
                               fontStyle = FontStyle.Normal,
                               fontSize = 20.sp
 
                          ),
-
-                         // on below line we are specifying font family.
                          fontFamily = FontFamily.Default,
-
-                         // on below line we are specifying font style
                          fontStyle = FontStyle.Normal,
-
-                         // on below line we are specifying font size.
                          fontSize = 20.sp
                     )
 
-                    // on below line we are creating a column and
-                    // specifying the horizontal and vertical arrangement
-                    // and specifying padding from all sides.
                     Column(
                          modifier = Modifier
                               .padding(18.dp)
@@ -94,54 +82,25 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                          horizontalAlignment = Alignment.CenterHorizontally,
                          verticalArrangement = Arrangement.Center
                     ) {
-                         // on below line we are creating a cross fade and
-                         // specifying target state as pie chart data the
-                         // method we have created in Pie chart data class.
-                         Crossfade(targetState = getPieChartData) { pieChartData ->
-                              // on below line we are creating an
-                              // android view for pie chart.
+                         Crossfade(targetState = filteredTaxes) { pieChartData ->
                               AndroidView(factory = { context ->
-                                   // on below line we are creating a pie chart
-                                   // and specifying layout params.
                                    PieChart(context).apply {
                                         layoutParams = LinearLayout.LayoutParams(
-                                             // on below line we are specifying layout
-                                             // params as MATCH PARENT for height and width.
                                              ViewGroup.LayoutParams.MATCH_PARENT,
                                              ViewGroup.LayoutParams.MATCH_PARENT,
                                         )
-                                        // on below line we are setting description
-                                        // enables for our pie chart.
                                         this.description.isEnabled = false
-
-                                        // on below line we are setting draw hole
-                                        // to false not to draw hole in pie chart
-                                        this.isDrawHoleEnabled = false
-
-                                        // on below line we are enabling legend.
+                                        this.isDrawHoleEnabled = true
                                         this.legend.isEnabled = true
-
-                                        // on below line we are specifying
-                                        // text size for our legend.
                                         this.legend.textSize = 14F
-
-                                        // on below line we are specifying
-                                        // alignment for our legend.
                                         this.legend.horizontalAlignment =
                                              Legend.LegendHorizontalAlignment.CENTER
-
-                                        // on below line we are specifying entry label color as white.
                                         ContextCompat.getColor(context, R.color.white)
-                                        //this.setEntryLabelColor(resources.getColor(R.color.white))
                                    }
                               },
-                                   // on below line we are specifying modifier
-                                   // for it and specifying padding to it.
                                    modifier = Modifier
                                         .wrapContentSize()
                                         .padding(5.dp), update = {
-                                        // on below line we are calling update pie chart
-                                        // method and passing pie chart and list of data.
                                         updatePieChartWithData(it, pieChartData, context)
                                    })
                          }
