@@ -1,4 +1,4 @@
-package com.example.fiscalize.views
+package com.example.fiscalize.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -44,7 +44,7 @@ import com.example.fiscalize.viewModel.uploadImageToApi
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HomeContent(
+fun HomeActivity(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
@@ -158,7 +158,7 @@ fun HomeContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { navController.navigate("taxes")  },
+                    onClick = { navController.navigate("main")  },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = mainRed,
                         contentColor = Color.White
@@ -171,14 +171,14 @@ fun HomeContent(
                         .height(100.dp)
                 ) {
                     Text(
-                        text = "Impostos",
+                        text = "Simples Nacional",
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
                     )
                 }
 
                 Button(
-                    onClick = {  },
+                    onClick = {  navController.navigate("dashboard")},
                     colors = ButtonDefaults.buttonColors(
                         containerColor = mainRed,
                         contentColor = Color.White
@@ -230,7 +230,11 @@ fun HomeContent(
                                 arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             )
                         }
-                    }) {
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = mainRed,
+                            contentColor = Color.White
+                        ),) {
                         Text("Tirar Foto")
                     }
                 },
@@ -238,7 +242,11 @@ fun HomeContent(
                     Button(onClick = {
                         showDialog = false
                         galleryLauncher.launch("image/*")
-                    }) {
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = mainRed,
+                            contentColor = Color.White
+                        ),) {
                         Text("Escolher da Galeria")
                     }
                 }

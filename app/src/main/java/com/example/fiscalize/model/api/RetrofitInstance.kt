@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
     private const val BASE_URL = BuildConfig.SERVER_IP
+    private lateinit var apiService: ApiService
 
     val api: ApiService by lazy {
         Retrofit.Builder()
@@ -14,4 +15,6 @@ object RetrofitInstance {
             .build()
             .create(ApiService::class.java)
     }
+
 }
+

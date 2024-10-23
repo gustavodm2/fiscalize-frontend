@@ -76,7 +76,12 @@ fun uploadImageToApi(context: Context, imageUri: Uri) {
 
 
         val requestBody = compressedImageBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
-        val multipartBody = MultipartBody.Part.createFormData("file", "image.png", requestBody)
+        val timestamp = System.currentTimeMillis().toString()
+        val multipartBody = MultipartBody.Part.createFormData(
+            "file",
+            "$timestamp.png",
+            requestBody
+        )
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

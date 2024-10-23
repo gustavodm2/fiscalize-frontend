@@ -14,3 +14,9 @@ val appGray = Color(0xFFDEDEDE)
 val primary = Color(0xFF374151)
 val offWhite = Color(0xFFfcf6f8)
 val mainRed = Color(0xFF7F2627)
+
+//chart colors
+val greenColor = Color(0xFF0F9D58)
+val blueColor = Color(0xFF2196F3)
+val yellowColor = Color(0xFFFFC107)
+val redColor = Color(0xFFF44336)
