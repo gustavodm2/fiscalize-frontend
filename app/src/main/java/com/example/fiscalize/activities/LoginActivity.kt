@@ -116,12 +116,15 @@ fun LoginActivity(modifier: Modifier = Modifier, navController: NavHostControlle
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        try {
-                            loginViewModel.loginUser(login, password, context)
-                            Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show()
-                            navController.navigate("home")
-                        } catch (e: Exception) {
-                            e.message?.let { Log.e("login", it) }
+                        if (login.isNotEmpty() && password.isNotEmpty()) {
+                            if (loginViewModel.loginUser(login, password, context)) {
+                                Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show()
+                                navController.navigate("home")
+                            } else {
+                                Toast.makeText(context, "Credenciais incorretas. Tente novamente.", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                         }
                     }
                 },

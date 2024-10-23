@@ -1,5 +1,11 @@
 *.iml
 .gradle
+caches/
+android/
+daemon/
+native/
+wrapper/
+.tmp/
 /local.properties
 /.idea/caches
 /.idea/libraries

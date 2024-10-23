@@ -15,13 +15,12 @@ import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
 
-    suspend fun loginUser(email: String, password: String, context: Context) {
+    suspend fun loginUser(email: String, password: String, context: Context): Boolean {
         val sessionManager: SessionManager = SessionManager(context)
         val apiClient: ApiService = RetrofitInstance.api
         val TAG = "login"
 
-
-        try {
+        return try {
             val response = apiClient.login(LoginRequest(email = email, password = password))
 
             if (response.isSuccessful) {
@@ -29,16 +28,18 @@ class LoginViewModel : ViewModel() {
                 if (loginResponse != null) {
                     sessionManager.saveAuthToken(loginResponse.authToken)
                     Log.i(TAG, "Token salvo: ${loginResponse.authToken}")
+                    true
                 } else {
                     Log.e(TAG, "Resposta vazia")
+                    false
                 }
             } else {
                 Log.e(TAG, "Erro na resposta: ${response.code()}")
+                false
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro na requisição: ${e.message}")
+            false
         }
-
     }
-
 }
