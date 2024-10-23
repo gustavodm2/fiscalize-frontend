@@ -106,11 +106,11 @@ fun TaxCard(tax: TaxModel) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "Código: ${tax.code}")
             Text(text = "Valor Principal: R$ ${tax.principal}")
-            if(tax.fine.isNotBlank()){
-                Text(text = "Multa: $tax")
+            if(tax.fine != "0"){
+                Text(text = "Multa: ${tax.fine}")
             }
-            if(tax.fine.isNotBlank()) {
-                Text(text = "Taxas: $tax")
+            if(tax.fees != "0") {
+                Text(text = "Juros: ${tax.fees}")
             }
             Text(text = "Total: R$ ${tax.total}")
         }

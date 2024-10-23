@@ -26,18 +26,12 @@ fun updatePieChartWithData(
     context: Context
 ) {
 
-
-
     val entries = ArrayList<PieEntry>()
-
-
 
     for (i in data.indices) {
         val item = data[i]
         entries.add(PieEntry(item.value ?: 0.toFloat(), item.browserName ?: ""))
     }
-
-
 
     val ds = PieDataSet(entries, "")
 
