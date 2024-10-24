@@ -4,39 +4,34 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
-import com.example.fiscalize.R
+import com.example.fiscalize.components.HeaderCard
+import com.example.fiscalize.model.api.ApiService
+import com.example.fiscalize.model.api.RetrofitInstance
+import com.example.fiscalize.model.api.SessionManager
+import com.example.fiscalize.model.user.User
 import com.example.fiscalize.viewModel.createImageFileUri
 import com.example.fiscalize.ui.theme.mainRed
 import com.example.fiscalize.viewModel.uploadImageToApi
@@ -49,8 +44,33 @@ fun HomeActivity(
     navController: NavHostController
 ) {
     val context = LocalContext.current
+    val sessionManager: SessionManager = SessionManager(context)
+    val apiClient: ApiService = RetrofitInstance.getApiService(context)
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember { mutableStateOf(false) }
+    var userId by remember { mutableStateOf<String?>(null) }
+    var user by remember { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(Unit) {
+        userId = sessionManager.fetchUserId()
+        userId?.let {
+            Log.d("HomeActivity", "UserId obtido do SessionManager: $it")
+            try {
+                val response = apiClient.getUserData(it)
+                if (response.isSuccessful) {
+                    response.body()?.let { responseUser ->
+                        user = responseUser
+                        Log.d("HomeActivity", "Dados do usuário recebidos com sucesso: ${responseUser.corporateName}")
+                    } ?: Log.e("HomeActivity", "Corpo da resposta está vazio.")
+                } else {
+                    Log.e("HomeActivity", "Falha ao obter dados do usuário: Código ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("HomeActivity", "Erro ao buscar dados do usuário: ${e.message}")
+            }
+        } ?: Log.e("HomeActivity", "userId é nulo.")
+    }
+
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
@@ -94,61 +114,7 @@ fun HomeActivity(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Card(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                border = BorderStroke(1.dp, Color.LightGray),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Logo Image
-                    Image(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = "App Logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, Color.Gray, CircleShape)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-
-                    Column(
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Razão Social: J&V",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = 16.sp,
-                                fontStyle = FontStyle.Italic
-                            ),
-                            color = Color(0xFF333333)
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Text(
-                            text = "CNPJ: 111.222.333-44",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 10.sp,
-                                fontStyle = FontStyle.Italic
-                            ),
-                            color = Color(0xFF777777)
-                        )
-                    }
-                }
-            }
+            HeaderCard(user = user)
             Spacer(Modifier.padding(8.dp))
 
             Row(

@@ -85,7 +85,7 @@ fun uploadImageToApi(context: Context, imageUri: Uri) {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitInstance.api.uploadImage(multipartBody)
+                val response = RetrofitInstance.getApiService(context).uploadImage(multipartBody)
 
                 if (response.isSuccessful) {
                     Log.d("UPLOAD", "Imagem enviada com sucesso: ${response}")

@@ -16,7 +16,25 @@ val offWhite = Color(0xFFfcf6f8)
 val mainRed = Color(0xFF7F2627)
 
 //chart colors
-val greenColor = Color(0xFF0F9D58)
-val blueColor = Color(0xFF2196F3)
-val yellowColor = Color(0xFFFFC107)
-val redColor = Color(0xFFF44336)
+val vividRed = Color(0xFFFF3B30)      // Vermelho vívido
+val brightOrange = Color(0xFFFF9500)  // Laranja brilhante
+val vividYellow = Color(0xFFFFCC00)   // Amarelo vívido
+val vibrantGreen = Color(0xFF34C759)  // Verde vibrante
+val brightCyan = Color(0xFF5AC8FA)    // Ciano brilhante
+val vividBlue = Color(0xFF007AFF)     // Azul vívido
+val vividPurple = Color(0xFFAF52DE)   // Roxo vívido
+val hotPink = Color(0xFFFF2D55)       // Rosa choque
+val brightTeal = Color(0xFF00D0C6)
+//val lightPurple = Color(0xFF9494B0)
+
+val appColors = listOf(
+    vividRed,
+    brightOrange,
+    vividYellow,
+    vibrantGreen,
+    brightCyan,
+    vividBlue,
+    vividPurple,
+    hotPink,
+    brightTeal
+)

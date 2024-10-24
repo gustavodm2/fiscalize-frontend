@@ -1,13 +1,12 @@
 package com.example.fiscalize.viewModel
 
 import android.content.Context
-import android.graphics.Color
+import androidx.compose.ui.graphics.toArgb // Certifique-se de importar isso
 import com.example.fiscalize.model.documents.FilteredTaxes
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import kotlin.random.Random
 
 fun updatePieChartWithData(
     chart: PieChart,
@@ -21,7 +20,7 @@ fun updatePieChartWithData(
         val totalValue = tax.total
         val denomination = tax.denomination.split(" ")[0]
         entries.add(PieEntry(totalValue, denomination))
-        colors.add(tax.color)
+        colors.add(tax.color.toArgb()) // Converter a cor para Int usando toArgb()
     }
 
     val ds = PieDataSet(entries, "")
@@ -40,5 +39,3 @@ fun updatePieChartWithData(
 
     chart.invalidate()
 }
-
-

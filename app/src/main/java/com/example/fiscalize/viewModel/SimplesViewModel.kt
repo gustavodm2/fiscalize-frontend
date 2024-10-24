@@ -1,17 +1,21 @@
 package com.example.fiscalize.viewModel
 
-import android.graphics.Color
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fiscalize.model.api.RetrofitInstance
 import com.example.fiscalize.model.documents.FilteredTaxes
 import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.ui.theme.appColors
 import kotlinx.coroutines.launch
+
 
 import kotlin.math.abs
 
@@ -21,14 +25,14 @@ class SimplesViewModel : ViewModel() {
     val filteredTaxes = mutableStateListOf<FilteredTaxes>()
     val TAG = "ApiCall"
 
-    fun getDocuments() {
+    fun getDocuments(context: Context) {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getDocuments()
+                val response = RetrofitInstance.getApiService(context).getDocuments()
                 if (response.isSuccessful) {
                     response.body()?.let { responseList ->
                         simplesNacional = responseList
-                        Log.d("simples", "${simplesNacional}")
+                        Log.d("simples", "$simplesNacional")
 
                         filterDocuments()
                     }
@@ -45,20 +49,8 @@ class SimplesViewModel : ViewModel() {
         selectedDocument = simplesModel
     }
 
-    private fun getColorForTax(code: String): Int {
-        val colors = listOf(
-            Color.RED,
-            Color.BLUE,
-            Color.GREEN,
-            Color.YELLOW,
-            Color.MAGENTA,
-            Color.CYAN,
-            Color.GRAY,
-            Color.DKGRAY,
-            Color.LTGRAY,
-            Color.BLACK
-            // Adicione mais cores se necessário
-        )
+    private fun getColorForTax(code: String): Color {
+        val colors = appColors
         val index = abs(code.hashCode()) % colors.size
         return colors[index]
     }

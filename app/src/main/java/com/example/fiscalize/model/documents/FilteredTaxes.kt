@@ -6,5 +6,5 @@ data class FilteredTaxes(
     val code: String,
     val total: Float,
     val denomination: String,
-    val color: Int
+    val color: Color
 )

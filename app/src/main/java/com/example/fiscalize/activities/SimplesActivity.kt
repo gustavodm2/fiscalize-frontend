@@ -32,7 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.fiscalize.R
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.example.fiscalize.viewModel.SimplesViewModel
 import com.example.fiscalize.viewModel.updatePieChartWithData
 import com.example.fiscalize.components.TaxCard
@@ -45,7 +44,7 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
      val context = LocalContext.current
 
      LaunchedEffect(Unit) {
-          simplesViewModel.getDocuments()
+          simplesViewModel.getDocuments(context)
      }
 
      Column(modifier = Modifier.fillMaxSize()) {

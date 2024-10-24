@@ -8,5 +8,5 @@ data class LoginResponse (
     var authToken: String,
 
     @SerializedName("id")
-    var user: String
+    var userId: String
 )

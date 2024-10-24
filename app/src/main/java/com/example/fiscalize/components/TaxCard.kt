@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TaxCard(denomination: String, totalValue: Float, color: Int) {
+fun TaxCard(denomination: String, totalValue: Float, color: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,7 +36,7 @@ fun TaxCard(denomination: String, totalValue: Float, color: Int) {
                 modifier = Modifier
                     .width(8.dp)
                     .height(64.dp)
-                    .background(Color(color))
+                    .background(color)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(

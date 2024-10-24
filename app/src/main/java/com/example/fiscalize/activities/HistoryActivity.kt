@@ -1,5 +1,6 @@
 package com.example.fiscalize.activities
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -28,9 +30,10 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController, simplesViewModel: SimplesViewModel) {
 
     val simplesDocument = simplesViewModel.simplesNacional
+    val context:Context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        simplesViewModel.getDocuments()
+        simplesViewModel.getDocuments(context)
     }
 
     LazyColumn(
