@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CameraTest"
+rootProject.name = "Fiscalize.ai"
 include(":app")
