@@ -29,17 +29,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.fiscalize.R
 import com.github.mikephil.charting.charts.PieChart
 import com.example.fiscalize.viewModel.SimplesViewModel
 import com.example.fiscalize.viewModel.updatePieChartWithData
 import com.example.fiscalize.components.TaxCard
+import com.example.fiscalize.model.documents.TaxModel
 
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostController) {
+fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController, simplesViewModel: SimplesViewModel) {
      val simplesViewModel: SimplesViewModel = viewModel()
      val context = LocalContext.current
 
@@ -61,7 +63,6 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                     .padding(top = 16.dp)
           )
 
-          // Gráfico de Pizza
           Column(
                modifier = Modifier
                     .padding(18.dp)
@@ -108,11 +109,9 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                          .fillMaxWidth()
                          .padding(top = 8.dp)
                ) {
-                    items(simplesViewModel.filteredTaxes) { tax ->
+                    items(simplesViewModel.Taxes) { tax ->
                          TaxCard(
-                              denomination = tax.denomination,
-                              totalValue = tax.total,
-                              color = tax.color // Passa a cor para o card
+                              tax, navController, simplesViewModel, mainHost
                          )
                     }
                }

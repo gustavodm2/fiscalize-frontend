@@ -19,7 +19,7 @@ import com.example.fiscalize.viewModel.SimplesViewModel
 fun DocDetailActivity(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: SimplesViewModel = viewModel()
+    viewModel: SimplesViewModel
 ) {
     val document = viewModel.selectedDocument
 
@@ -59,7 +59,7 @@ fun DocDetailActivity(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(document.taxes) { tax ->
-                    TaxCard(tax)
+                    DocCard(tax)
                 }
             }
         }
@@ -91,7 +91,7 @@ fun DetailItem(label: String, value: String?) {
 }
 
 @Composable
-fun TaxCard(tax: TaxModel) {
+fun DocCard(tax: TaxModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

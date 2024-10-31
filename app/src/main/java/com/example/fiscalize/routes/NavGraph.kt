@@ -35,6 +35,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.navigation.navigation
 import com.example.fiscalize.activities.DocDetailActivity
 import com.example.fiscalize.activities.HomeActivity
+import com.example.fiscalize.activities.taxDetailActivity
 import com.example.fiscalize.model.api.SessionManager
 import com.example.fiscalize.viewModel.LoginViewModel
 import com.example.fiscalize.viewModel.SimplesViewModel
@@ -69,13 +70,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             composable("home") { HomeActivity(modifier, navController) }
             composable("login") { LoginActivity(modifier, navController, loginViewModel) }
             composable("docDetail") { DocDetailActivity(modifier, navController, simplesViewModel) }
+            composable("taxDetail") { taxDetailActivity(modifier, navController, simplesViewModel) }
 
             navigation(startDestination = "dashboard", route = "main") {
                 composable("dashboard") {
                     BottomTabNavigation(modifier, navController, simplesViewModel)
                 }
+            }
+            navigation(startDestination = "taxes", route = "main") {
                 composable("taxes") {
-                    SimplesActivity(modifier, navController)
+                    BottomTabNavigation(modifier, navController, simplesViewModel)
                 }
             }
         }
@@ -110,7 +114,7 @@ fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController, 
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("dashboard") { HistoryActivity(modifier, navController, mainHost, simplesViewModel) }
-            composable("taxes") { SimplesActivity(modifier, navController) }
+            composable("taxes") { SimplesActivity(modifier, navController, mainHost, simplesViewModel) }
         }
     }
 }

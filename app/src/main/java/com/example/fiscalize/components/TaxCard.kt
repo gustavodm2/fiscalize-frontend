@@ -1,6 +1,7 @@
 package com.example.fiscalize.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,36 +20,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.model.documents.TaxModel
+import com.example.fiscalize.viewModel.SimplesViewModel
 
 @Composable
-fun TaxCard(denomination: String, totalValue: Float, color: Color) {
+fun TaxCard(tax: TaxModel, navController: NavHostController, simplesViewModel: SimplesViewModel, mainHost: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                simplesViewModel.updateSelectedTax(tax)
+                mainHost.navigate("taxDetail")
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Barra colorida representando a cor do imposto
             Box(
                 modifier = Modifier
                     .width(8.dp)
                     .height(64.dp)
-                    .background(color)
+
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(
-                    text = denomination.split(" ")[0],
+                    text = tax.denomination,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Valor: R$ ${"%.2f".format(totalValue)}",
+                    text = "Valor: R$ ${"%.2f" + tax.total}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

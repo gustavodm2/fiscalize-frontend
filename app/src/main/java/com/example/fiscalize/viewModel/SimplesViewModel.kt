@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fiscalize.model.api.RetrofitInstance
 import com.example.fiscalize.model.documents.FilteredTaxes
 import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.ui.theme.appColors
 import kotlinx.coroutines.launch
 
@@ -22,6 +23,7 @@ import kotlin.math.abs
 class SimplesViewModel : ViewModel() {
 
     var simplesNacional by mutableStateOf(listOf<SimplesModel>())
+    var Taxes by mutableStateOf(listOf<TaxModel>())
     val filteredTaxes = mutableStateListOf<FilteredTaxes>()
     val TAG = "ApiCall"
 
@@ -32,7 +34,11 @@ class SimplesViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let { responseList ->
                         simplesNacional = responseList
+
+                        Taxes = simplesNacional.flatMap { it.taxes }
+
                         Log.d("simples", "$simplesNacional")
+                        Log.d("Taxes", "$Taxes")
 
                         filterDocuments()
                     }
@@ -47,6 +53,12 @@ class SimplesViewModel : ViewModel() {
 
     fun updateSelectedTvShow(simplesModel: SimplesModel) {
         selectedDocument = simplesModel
+    }
+
+    var selectedTax by mutableStateOf<TaxModel?>(null)
+
+    fun updateSelectedTax(tax: TaxModel) {
+        selectedTax = tax
     }
 
     private fun getColorForTax(code: String): Color {
