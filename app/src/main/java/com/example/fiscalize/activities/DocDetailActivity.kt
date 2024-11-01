@@ -1,5 +1,6 @@
 package com.example.fiscalize.activities
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,8 @@ fun DocDetailActivity(
     viewModel: SimplesViewModel
 ) {
     val document = viewModel.selectedDocument
+
+    Log.d("nando enorme", "$document")
 
     if (document != null) {
         Column(

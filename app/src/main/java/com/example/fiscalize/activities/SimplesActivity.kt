@@ -80,7 +80,6 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                               )
                               this.description.isEnabled = false
                               this.isDrawHoleEnabled = true
-                              // Desabilita a legenda
                               this.legend.isEnabled = false
                               ContextCompat.getColor(context, R.color.white)
                          }
@@ -93,7 +92,6 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                }
           }
 
-          // Verificação se a lista está vazia
           if (simplesViewModel.filteredTaxes.isEmpty()) {
                Text(
                     text = "Nenhum imposto encontrado.",
@@ -103,7 +101,6 @@ fun SimplesActivity(modifier: Modifier = Modifier, navController: NavHostControl
                     style = MaterialTheme.typography.bodyMedium
                )
           } else {
-               // Lista de TaxCards
                LazyColumn(
                     modifier = Modifier
                          .fillMaxWidth()

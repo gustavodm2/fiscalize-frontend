@@ -18,17 +18,12 @@ import kotlin.math.log
 @Composable
 fun taxDetailActivity(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navController: NavHostController,
     viewModel: SimplesViewModel
 ) {
-
-
     val tax = viewModel.selectedTax
 
     Log.d("nando magro", "$tax")
-
-    if(tax != null){
-        Text(text = "cacete")
-    }
 }
+
 

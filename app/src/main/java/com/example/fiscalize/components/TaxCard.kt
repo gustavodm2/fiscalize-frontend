@@ -1,5 +1,6 @@
 package com.example.fiscalize.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,13 +28,14 @@ import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.viewModel.SimplesViewModel
 
 @Composable
-fun TaxCard(tax: TaxModel, navController: NavHostController, simplesViewModel: SimplesViewModel, mainHost: NavController) {
+fun TaxCard(tax: TaxModel, navController: NavController, simplesViewModel: SimplesViewModel, mainHost: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
                 simplesViewModel.updateSelectedTax(tax)
+                Log.d("nando gordo", "$tax")
                 mainHost.navigate("taxDetail")
             },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

@@ -16,6 +16,7 @@ import com.example.fiscalize.model.documents.SimplesModel
 import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.ui.theme.appColors
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 
 
 import kotlin.math.abs
@@ -59,6 +60,7 @@ class SimplesViewModel : ViewModel() {
 
     fun updateSelectedTax(tax: TaxModel) {
         selectedTax = tax
+        Log.d("nando caralho", "${selectedTax}")
     }
 
     private fun getColorForTax(code: String): Color {

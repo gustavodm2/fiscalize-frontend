@@ -1,6 +1,8 @@
 package com.example.fiscalize.components
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,15 +28,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.fiscalize.R
+import com.example.fiscalize.model.api.SessionManager
 import com.example.fiscalize.model.user.User
 
 
 
 @Composable
 fun HeaderCard(
-    user: User?
+    user: User?,
+    navController: NavHostController,  // Adicione navController como parâmetro
+    context: Context // Adicione o contexto para acessar o SessionManager
 ) {
+    val sessionManager = SessionManager(context) // Inicialize o SessionManager
+
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -99,8 +107,14 @@ fun HeaderCard(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .size(40.dp)
-                    .padding(8.dp) // Ajusta o espaçamento do ícone em relação à borda
+                    .padding(8.dp)
+                    .clickable {
+                        // Realize o logout e navegue para a tela de login
+                        sessionManager.clearAuthToken() // Limpa o token de autenticação
+                        navController.navigate("login")
+                    }
             )
         }
     }
 }
+

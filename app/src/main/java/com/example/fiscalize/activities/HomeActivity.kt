@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.fiscalize.components.HeaderCard
 import com.example.fiscalize.model.api.ApiService
@@ -114,7 +115,7 @@ fun HomeActivity(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            HeaderCard(user = user)
+            HeaderCard(user = user, navController = navController, context = LocalContext.current)
             Spacer(Modifier.padding(8.dp))
 
             Row(
