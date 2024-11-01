@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fiscalize.model.api.RetrofitInstance
@@ -16,17 +15,22 @@ import com.example.fiscalize.model.documents.SimplesModel
 import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.ui.theme.appColors
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 
 
 import kotlin.math.abs
 
-class SimplesViewModel : ViewModel() {
+class GraphViewModel : ViewModel() {
 
     var simplesNacional by mutableStateOf(listOf<SimplesModel>())
-    var Taxes by mutableStateOf(listOf<TaxModel>())
+    var taxes by mutableStateOf(listOf<TaxModel>())
     val filteredTaxes = mutableStateListOf<FilteredTaxes>()
     val TAG = "ApiCall"
+
+    var selectedDocument by mutableStateOf<SimplesModel?>(null)
+
+    var selectedTax by mutableStateOf<FilteredTaxes?>(null)
+
+    var taxListByCode by mutableStateOf(listOf<TaxModel>())
 
     fun getDocuments(context: Context) {
         viewModelScope.launch {
@@ -36,10 +40,7 @@ class SimplesViewModel : ViewModel() {
                     response.body()?.let { responseList ->
                         simplesNacional = responseList
 
-                        Taxes = simplesNacional.flatMap { it.taxes }
-
-                        Log.d("simples", "$simplesNacional")
-                        Log.d("Taxes", "$Taxes")
+                        taxes = simplesNacional.flatMap { it.taxes }
 
                         filterDocuments()
                     }
@@ -50,17 +51,12 @@ class SimplesViewModel : ViewModel() {
         }
     }
 
-    var selectedDocument by mutableStateOf<SimplesModel?>(null)
-
-    fun updateSelectedTvShow(simplesModel: SimplesModel) {
+    fun updateSelectedDocument(simplesModel: SimplesModel) {
         selectedDocument = simplesModel
     }
 
-    var selectedTax by mutableStateOf<TaxModel?>(null)
-
-    fun updateSelectedTax(tax: TaxModel) {
+    fun updateSelectedTax(tax: FilteredTaxes) {
         selectedTax = tax
-        Log.d("nando caralho", "${selectedTax}")
     }
 
     private fun getColorForTax(code: String): Color {
@@ -95,8 +91,10 @@ class SimplesViewModel : ViewModel() {
                 }
             }
         }
-
-        Log.d("Filtered Taxes", "$filteredTaxes")
     }
+    fun findAllTaxesByCode(taxCode: String): List<TaxModel> {
+        return taxes.filter { it.code == taxCode }
+    }
+
 }
 

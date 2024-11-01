@@ -19,17 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.fiscalize.model.documents.SimplesModel
-import com.example.fiscalize.viewModel.SimplesViewModel
+import com.example.fiscalize.viewModel.GraphViewModel
 
 @Composable
-fun SimplesCard(document: SimplesModel, navController: NavController, simplesViewModel: SimplesViewModel, mainHost: NavController) {
+fun SimplesCard(document: SimplesModel, navController: NavController, graphViewModel: GraphViewModel, mainHost: NavController) {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .height(64.dp)
             .clickable {
-                simplesViewModel.updateSelectedTvShow(document)
+                graphViewModel.updateSelectedDocument(document)
                 mainHost.navigate("docDetail")
             },
         shape = RoundedCornerShape(8.dp),

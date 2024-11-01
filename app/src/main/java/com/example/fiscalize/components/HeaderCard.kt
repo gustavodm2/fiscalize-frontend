@@ -38,10 +38,10 @@ import com.example.fiscalize.model.user.User
 @Composable
 fun HeaderCard(
     user: User?,
-    navController: NavHostController,  // Adicione navController como parâmetro
-    context: Context // Adicione o contexto para acessar o SessionManager
+    navController: NavHostController,
+    context: Context
 ) {
-    val sessionManager = SessionManager(context) // Inicialize o SessionManager
+    val sessionManager = SessionManager(context)
 
     Card(
         modifier = Modifier
@@ -109,8 +109,7 @@ fun HeaderCard(
                     .size(40.dp)
                     .padding(8.dp)
                     .clickable {
-                        // Realize o logout e navegue para a tela de login
-                        sessionManager.clearAuthToken() // Limpa o token de autenticação
+                        sessionManager.clearAuthToken()
                         navController.navigate("login")
                     }
             )
