@@ -57,38 +57,40 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     )
 
     LaunchedEffect(Unit) {
-        userToken = sessionManager.fetchAuthToken().toString()
+        userToken = sessionManager.fetchAuthToken()
     }
 
-    if (userToken != null) {
-        val startDestination = if (userToken!!.isNotEmpty()) "home" else "login"
+    val startDestination = if (userToken.isNullOrEmpty()) "login" else "home"
 
-        NavHost(
-            navController = navController,
-            startDestination = startDestination
-        ) {
-            composable("home") { HomeActivity(modifier, navController) }
-            composable("login") { LoginActivity(modifier, navController, loginViewModel) }
-            composable("docDetail") { DocDetailActivity(modifier, navController, simplesViewModel) }
-            composable("taxDetail") { taxDetailActivity(modifier, navController, simplesViewModel) }
-
-            navigation(startDestination = "dashboard", route = "main") {
-                composable("dashboard") {
-                    BottomTabNavigation(modifier, navController, simplesViewModel)
-                }
-            }
-            navigation(startDestination = "taxes", route = "main") {
-                composable("taxes") {
-                    BottomTabNavigation(modifier, navController, simplesViewModel)
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable("home") { HomeActivity(modifier, navController) }
+        composable("login") {
+            LoginActivity(modifier, navController, loginViewModel)
+            LaunchedEffect(Unit) {
+                // Atualizar o token assim que o usuário fizer login
+                userToken = sessionManager.fetchAuthToken()
+                if (!userToken.isNullOrEmpty()) {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true } //popUpTo para limpar a pilha de navegacao
+                    }
                 }
             }
         }
-    } else {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
+        composable("docDetail") { DocDetailActivity(modifier, navController, simplesViewModel) }
+        composable("taxDetail") { taxDetailActivity(modifier, navController, simplesViewModel) }
+
+        navigation(startDestination = "dashboard", route = "main") {
+            composable("dashboard") {
+                BottomTabNavigation(modifier, navController, simplesViewModel)
+            }
+        }
+        navigation(startDestination = "taxes", route = "main") {
+            composable("taxes") {
+                BottomTabNavigation(modifier, navController, simplesViewModel)
+            }
         }
     }
 }
@@ -118,7 +120,6 @@ fun BottomTabNavigation(modifier: Modifier = Modifier, mainHost: NavController, 
         }
     }
 }
-
 
 @Composable
 fun BottomNavigationBar(navController: NavController, items: List<BottomNavItem>) {
