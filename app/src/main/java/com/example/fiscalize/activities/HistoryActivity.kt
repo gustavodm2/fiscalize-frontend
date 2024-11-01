@@ -22,42 +22,55 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.fiscalize.components.SimplesCard
-import com.example.fiscalize.viewModel.SimplesViewModel
+import com.example.fiscalize.viewModel.GraphViewModel
 
+
+import androidx.compose.material3.Scaffold
+import com.example.fiscalize.components.TopBarComponent
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun HistoryActivity(modifier: Modifier = Modifier, navController: NavHostController, mainHost: NavController, simplesViewModel: SimplesViewModel) {
-
-    val simplesDocument = simplesViewModel.simplesNacional
-    val context:Context = LocalContext.current
+fun HistoryActivity(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    mainHost: NavController,
+    graphViewModel: GraphViewModel
+) {
+    val simplesDocument = graphViewModel.simplesNacional
+    val context: Context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        simplesViewModel.getDocuments(context)
+        graphViewModel.getDocuments(context)
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 25.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Histórico de documentos",
-                    style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                )
+    Scaffold(
+        topBar = { TopBarComponent() }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 25.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Histórico de documentos",
+                        style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
-        }
-        items(simplesDocument) { doc ->
-            SimplesCard(doc, navController, simplesViewModel, mainHost)
+            items(simplesDocument) { doc ->
+                SimplesCard(doc, navController, graphViewModel, mainHost)
+            }
         }
     }
 }

@@ -10,16 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.fiscalize.model.documents.TaxModel
-import com.example.fiscalize.viewModel.SimplesViewModel
+import com.example.fiscalize.viewModel.GraphViewModel
 
 @Composable
 fun DocDetailActivity(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: SimplesViewModel = viewModel()
+    viewModel: GraphViewModel
 ) {
     val document = viewModel.selectedDocument
 
@@ -59,7 +58,7 @@ fun DocDetailActivity(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(document.taxes) { tax ->
-                    TaxCard(tax)
+                    DocCard(tax)
                 }
             }
         }
@@ -91,7 +90,7 @@ fun DetailItem(label: String, value: String?) {
 }
 
 @Composable
-fun TaxCard(tax: TaxModel) {
+fun DocCard(tax: TaxModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

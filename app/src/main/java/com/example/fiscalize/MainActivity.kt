@@ -1,6 +1,6 @@
 package com.example.fiscalize
 
-import AppNavigation
+import com.example.fiscalize.routes.AppNavigation
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.fiscalize.components.TopBarComponent
 import com.example.fiscalize.ui.theme.FiscalizeTheme
 
 

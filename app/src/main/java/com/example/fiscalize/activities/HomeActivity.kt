@@ -54,7 +54,6 @@ fun HomeActivity(
     LaunchedEffect(Unit) {
         userId = sessionManager.fetchUserId()
         userId?.let {
-            Log.d("HomeActivity", "UserId obtido do SessionManager: $it")
             try {
                 val response = apiClient.getUserData(it)
                 if (response.isSuccessful) {
@@ -114,7 +113,7 @@ fun HomeActivity(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            HeaderCard(user = user)
+            HeaderCard(user = user, navController = navController, context = LocalContext.current)
             Spacer(Modifier.padding(8.dp))
 
             Row(
