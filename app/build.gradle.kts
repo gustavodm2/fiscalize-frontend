@@ -107,4 +107,6 @@ dependencies {
     //okhttp3
     implementation(libs.okhttp)
 
+    runtimeOnly(libs.accompanist.pager)
+
 }
