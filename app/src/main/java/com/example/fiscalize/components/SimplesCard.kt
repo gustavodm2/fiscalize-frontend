@@ -1,5 +1,6 @@
 package com.example.fiscalize.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -40,9 +41,11 @@ fun SimplesCard(document: SimplesModel, navController: NavController, graphViewM
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
+
                 "${document.calculationPeriod}\n${document.documentNumber}",
                 modifier = Modifier.padding(8.dp)
             )
+            Log.d("debug", document.calculationPeriod)
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = "Ir para detalhes do documento",
