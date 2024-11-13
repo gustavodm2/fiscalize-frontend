@@ -72,7 +72,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 userToken = sessionManager.fetchAuthToken()
                 if (!userToken.isNullOrEmpty()) {
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true } //popUpTo para limpar a pilha de navegacao
+                        popUpTo("login") { inclusive = true }
                     }
                 }
             }

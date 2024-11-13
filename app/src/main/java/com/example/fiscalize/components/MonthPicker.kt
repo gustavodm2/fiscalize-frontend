@@ -1,5 +1,6 @@
 package com.example.fiscalize.components
 
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fiscalize.viewModel.GraphViewModel
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -30,8 +32,11 @@ fun MonthPicker(
     currentMonth: Int,
     currentYear: Int,
     confirmButtonCLicked: (Int, Int) -> Unit,
-    cancelClicked: () -> Unit
+    cancelClicked: () -> Unit,
+
 ) {
+
+
 
     val months = listOf(
         "JAN",
@@ -215,6 +220,7 @@ fun MonthPicker(
                                 months.indexOf(month) + 1,
                                 year
                             )
+
                         },
                         shape = CircleShape,
                         border = BorderStroke(1.dp, color = Color.Blue),

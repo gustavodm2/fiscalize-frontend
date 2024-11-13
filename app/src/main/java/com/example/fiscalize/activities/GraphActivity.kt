@@ -48,9 +48,9 @@ fun GraphActivity(
 ) {
      val context = LocalContext.current
 
-     LaunchedEffect(Unit) {
-          graphViewModel.getDocuments(context)
-     }
+//     LaunchedEffect(Unit) {
+//          graphViewModel.getDocuments(context)
+//     }
 
      Scaffold(
           topBar = { TopBarComponent() }

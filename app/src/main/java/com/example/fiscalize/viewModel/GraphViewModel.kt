@@ -10,11 +10,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fiscalize.model.api.RetrofitInstance
+import com.example.fiscalize.model.api.SessionManager
 import com.example.fiscalize.model.documents.FilteredTaxes
 import com.example.fiscalize.model.documents.SimplesModel
 import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.ui.theme.appColors
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 import kotlin.math.abs
@@ -30,19 +33,23 @@ class GraphViewModel : ViewModel() {
 
     var selectedTax by mutableStateOf<FilteredTaxes?>(null)
 
-    var taxListByCode by mutableStateOf(listOf<TaxModel>())
-
-    fun getDocuments(context: Context) {
+    fun getDocuments(context: Context, page: Int, startDate: String, endDate: String) {
+        val sessionManager: SessionManager = SessionManager(context)
+        val page = 1
+        val userId = sessionManager.fetchUserId()
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.getApiService(context).getDocuments()
-                if (response.isSuccessful) {
-                    response.body()?.let { responseList ->
-                        simplesNacional = responseList
+                val response = userId?.let { RetrofitInstance.getApiService(context).getDocumentsByUser(userId = it, page = page, startDate = startDate, endDate = endDate) }
+                Log.d("caceteresponse", "$response")
+                if (response != null) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { responseList ->
+                            simplesNacional = responseList
+                            Log.d("cacete", "$simplesNacional")
+                            taxes = simplesNacional.flatMap { it.taxes }
 
-                        taxes = simplesNacional.flatMap { it.taxes }
-
-                        filterDocuments()
+                            filterDocuments()
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -92,9 +99,21 @@ class GraphViewModel : ViewModel() {
             }
         }
     }
+
     fun findAllTaxesByCode(taxCode: String): List<TaxModel> {
         return taxes.filter { it.code == taxCode }
     }
+
+    fun formatDate(input: String): String {
+        val inputFormat = SimpleDateFormat("MM/yyyy", Locale("pt", "BR"))
+        val outputFormat = SimpleDateFormat("MMMM/yyyy", Locale("pt", "BR"))
+
+        val date = inputFormat.parse(input)
+        return outputFormat.format(date)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+    }
+
+
 
 }
 

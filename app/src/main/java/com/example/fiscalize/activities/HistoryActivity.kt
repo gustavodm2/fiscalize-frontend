@@ -3,6 +3,7 @@ package com.example.fiscalize.activities
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import com.example.fiscalize.viewModel.GraphViewModel
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import com.example.fiscalize.components.MonthPicker
 import com.example.fiscalize.components.TopBarComponent
 import com.example.fiscalize.model.documents.SimplesModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
@@ -63,8 +67,21 @@ fun HistoryActivity(
     var startDate by remember { mutableStateOf("de") }
     var endDate by remember { mutableStateOf("até") }
 
-    LaunchedEffect(Unit) {
-        graphViewModel.getDocuments(context)
+    var currentPage by remember { mutableIntStateOf(1) }
+    var isLoading by remember { mutableStateOf(false) }
+
+
+
+
+    LaunchedEffect(currentPage) {
+        graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
+        isLoading = true
+        val newDocs = filteredDocuments
+        if (newDocs.isNotEmpty()) {
+            filteredDocuments += newDocs
+            currentPage++
+        }
+        isLoading = false
     }
 
     Scaffold(
@@ -96,6 +113,7 @@ fun HistoryActivity(
                         color = Color.Black
                     )
 
+
                     Text(
                         text = endDate,
                         modifier = Modifier
@@ -118,20 +136,6 @@ fun HistoryActivity(
                     )
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 25.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Histórico de documentos",
-                        style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
             }
 
             items(filteredDocuments) { doc ->
@@ -147,13 +151,19 @@ fun HistoryActivity(
                 confirmButtonCLicked = { month, year ->
                     val formattedDate = "${month}/${year}"
                     if (selectedDateField == "start") {
-                        startDate = formattedDate
+                        startDate = graphViewModel.formatDate(formattedDate)
+
                     } else {
-                        endDate = formattedDate
+                        endDate = graphViewModel.formatDate(formattedDate)
+
                     }
+                    Log.d("cacetedate", "$startDate, $endDate")
+
+                    graphViewModel.getDocuments(context, page = 1, startDate, endDate)
                     visible = false
                 },
-                cancelClicked = { visible = false }
+                cancelClicked = { visible = false },
+
             )
         }
     }
