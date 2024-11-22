@@ -44,8 +44,9 @@ class GraphViewModel : ViewModel() {
                 if (response != null) {
                     if (response.isSuccessful) {
                         response.body()?.let { responseList ->
-                            simplesNacional = responseList
-                            Log.d("cacete", "$simplesNacional")
+                            val uniqueDocuments = responseList.filter { it !in simplesNacional }
+                            simplesNacional = listOf<SimplesModel>()
+                            simplesNacional += uniqueDocuments
                             taxes = simplesNacional.flatMap { it.taxes }
 
                             filterDocuments()

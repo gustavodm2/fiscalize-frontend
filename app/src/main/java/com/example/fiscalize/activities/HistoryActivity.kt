@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.example.fiscalize.components.MonthPicker
@@ -70,29 +72,61 @@ fun HistoryActivity(
     var currentPage by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
 
+    val listState = rememberLazyListState()
+    var hasMoreDocuments by remember { mutableStateOf(true) }
 
+    fun loadDocuments() {
+        if (!isLoading && hasMoreDocuments) {
+            isLoading = true
+            graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
 
-
-    LaunchedEffect(currentPage) {
-        graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
-        isLoading = true
-        val newDocs = filteredDocuments
-        if (newDocs.isNotEmpty()) {
-            filteredDocuments += newDocs
-            currentPage++
+            val newDocuments = graphViewModel.simplesNacional
+            if (newDocuments.isNotEmpty()) {
+                // Filtra documentos repetidos
+                filteredDocuments += newDocuments.filter { it !in filteredDocuments }
+                currentPage++
+            } else {
+                // Se nenhum documento novo for retornado, interrompe a paginação
+                hasMoreDocuments = false
+            }
+            isLoading = false
         }
-        isLoading = false
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastVisibleIndex ->
+                val totalItems = listState.layoutInfo.totalItemsCount
+                if (lastVisibleIndex != null && totalItems > 0 && lastVisibleIndex == totalItems - 1 && !isLoading && hasMoreDocuments) {
+                    // Usuário chegou ao final da lista e ainda há documentos para carregar
+                    isLoading = true
+                    graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
+
+                    val newDocuments = graphViewModel.simplesNacional
+                    if (newDocuments.isNotEmpty()) {
+                        // Filtra documentos repetidos
+                        filteredDocuments += newDocuments.filter { it !in filteredDocuments }
+                        currentPage++
+                    } else {
+                        // Se nenhum documento novo for retornado, interrompe a paginação
+                        hasMoreDocuments = false
+                    }
+                    isLoading = false
+                }
+            }
     }
 
     Scaffold(
         topBar = { TopBarComponent() }
     ) { paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValues),
             contentPadding = PaddingValues(16.dp)
         ) {
+
             item {
                 Row(
                     modifier = Modifier
@@ -133,14 +167,36 @@ fun HistoryActivity(
                         modifier = Modifier
                             .padding(8.dp)
                             .size(16.dp)
+                            .clickable {
+                                // Reseta a paginação e carrega documentos
+                                currentPage = 1
+                                hasMoreDocuments = true
+                                filteredDocuments = emptyList() // Limpa os documentos filtrados
+                                loadDocuments() // Chama a função de carregar documentos
+                            }
                     )
                 }
 
             }
 
             items(filteredDocuments) { doc ->
+                Log.d("LazyColumnDoc", "Documento: $doc")
                 SimplesCard(doc, navController, graphViewModel, mainHost)
             }
+
+            if (isLoading) {
+                item {
+                    Text(
+                        text = "Carregando...",
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        color = Color.Gray
+                    )
+                }
+            }
+
+
         }
 
         if (visible) {
