@@ -48,13 +48,6 @@ fun GraphActivity(
      graphViewModel: GraphViewModel
 ) {
      val context = LocalContext.current
-     val listState = rememberLazyListState()
-     val currentPage = remember { graphViewModel.currentPage }
-
-     LaunchedEffect(Unit) {
-          graphViewModel.getDocumentsWODate(context, page = currentPage)
-     }
-
 
      Scaffold(
           topBar = { TopBarComponent() }
@@ -133,11 +126,3 @@ fun GraphActivity(
           }
      }
 }
-
-
-
-
-
-
-
-

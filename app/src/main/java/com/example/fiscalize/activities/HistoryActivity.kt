@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,10 +46,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.fiscalize.components.MonthPicker
 import com.example.fiscalize.components.TopBarComponent
 import com.example.fiscalize.model.documents.SimplesModel
+import com.example.fiscalize.ui.theme.mainRed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -63,75 +67,34 @@ fun HistoryActivity(
     graphViewModel: GraphViewModel
 ) {
     val context: Context = LocalContext.current
-    var filteredDocuments by remember { mutableStateOf(graphViewModel.simplesNacional) }
+
+    val filteredDocuments by graphViewModel::simplesNacional
+    val hasMoreDocuments by graphViewModel::hasMorePages
 
     var visible by remember { mutableStateOf(false) }
     var selectedDateField by remember { mutableStateOf("") }
     var startDate by rememberSaveable { mutableStateOf("de") }
     var endDate by rememberSaveable { mutableStateOf("até") }
 
-    var currentPage by remember { mutableIntStateOf(1) }
-    var isLoading by remember { mutableStateOf(false) }
+    var currentPage by rememberSaveable { mutableStateOf(1) }
 
     val listState = rememberLazyListState()
-    var hasMoreDocuments by remember { mutableStateOf(true) }
 
     fun loadDocuments() {
-        if (!isLoading && hasMoreDocuments) {
-            isLoading = true
-            graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
-
-            val newDocuments = graphViewModel.simplesNacional
-            if (newDocuments.isNotEmpty()) {
-                filteredDocuments += newDocuments.filter { it !in filteredDocuments }
-                currentPage++
+        if (hasMoreDocuments) {
+            if (startDate != "de" && endDate != "até") {
+                graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
             } else {
-                hasMoreDocuments = false
+                graphViewModel.getDocumentsWODate(context, page = currentPage)
             }
-            isLoading = false
+            currentPage++
         }
     }
 
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleIndex ->
-                val totalItems = listState.layoutInfo.totalItemsCount
-                if (lastVisibleIndex != null && totalItems > 0 && lastVisibleIndex == totalItems - 1 && !isLoading && hasMoreDocuments) {
-                    isLoading = true
-                    graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
-
-                    val newDocuments = graphViewModel.simplesNacional
-                    if (newDocuments.isNotEmpty()) {
-                        filteredDocuments += newDocuments.filter { it !in filteredDocuments }
-                        currentPage++
-                    } else {
-                        hasMoreDocuments = false
-                    }
-                    isLoading = false
-                }
-            }
+    LaunchedEffect(Unit) {
+        loadDocuments()
     }
 
-
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleIndex ->
-                val totalItems = listState.layoutInfo.totalItemsCount
-                if (lastVisibleIndex != null && totalItems > 0 && lastVisibleIndex == totalItems - 1 && !isLoading && hasMoreDocuments) {
-                    isLoading = true
-                    graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
-
-                    val newDocuments = graphViewModel.simplesNacional
-                    if (newDocuments.isNotEmpty()) {
-                        filteredDocuments += newDocuments.filter { it !in filteredDocuments }
-                        currentPage++
-                    } else {
-                        hasMoreDocuments = false
-                    }
-                    isLoading = false
-                }
-            }
-    }
 
     Scaffold(
         topBar = { TopBarComponent() }
@@ -164,7 +127,6 @@ fun HistoryActivity(
                         color = Color.Black
                     )
 
-
                     Text(
                         text = endDate,
                         modifier = Modifier
@@ -186,13 +148,11 @@ fun HistoryActivity(
                             .size(32.dp)
                             .clickable {
                                 currentPage = 1
-                                hasMoreDocuments = true
-                                filteredDocuments = emptyList()
+                                graphViewModel.resetDocuments()
                                 loadDocuments()
                             }
                     )
                 }
-
             }
 
             items(filteredDocuments) { doc ->
@@ -200,19 +160,32 @@ fun HistoryActivity(
                 SimplesCard(doc, navController, graphViewModel, mainHost)
             }
 
-            if (isLoading) {
+            if (hasMoreDocuments) {
+                item {
+                    Button(
+                        onClick = { loadDocuments() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = mainRed,
+                        )
+
+                    ) {
+                        Text("Carregar mais documentos", color = Color.White)
+                    }
+                }
+            } else if (filteredDocuments.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Carregando...",
+                        text = "Todos os documentos foram carregados.",
                         modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        color = Color.Gray
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-
-
         }
 
         if (visible) {
@@ -224,18 +197,15 @@ fun HistoryActivity(
                     val formattedDate = "${month}/${year}"
                     if (selectedDateField == "start") {
                         startDate = graphViewModel.formatDate(formattedDate)
-
                     } else {
                         endDate = graphViewModel.formatDate(formattedDate)
-
                     }
-                    Log.d("cacetedate", "$startDate, $endDate")
-
-                    graphViewModel.getDocuments(context, page = 1, startDate, endDate)
+                    currentPage = 1
+                    graphViewModel.resetDocuments()
+                    loadDocuments()
                     visible = false
                 },
                 cancelClicked = { visible = false },
-
             )
         }
     }

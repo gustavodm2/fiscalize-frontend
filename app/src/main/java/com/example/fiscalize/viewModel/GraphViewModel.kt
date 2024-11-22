@@ -33,17 +33,17 @@ class GraphViewModel : ViewModel() {
 
     var selectedTax by mutableStateOf<FilteredTaxes?>(null)
 
-    var currentPage by mutableStateOf(1)
-    var isLoading by mutableStateOf(false)
     var hasMorePages by mutableStateOf(true)
 
-
+    fun resetDocuments() {
+        simplesNacional = emptyList()
+        hasMorePages = true
+    }
 
     fun getDocuments(context: Context, page: Int, startDate: String, endDate: String) {
         val sessionManager = SessionManager(context)
         val userId = sessionManager.fetchUserId()
         viewModelScope.launch {
-            isLoading = true
             try {
                 val response = userId?.let {
                     RetrofitInstance.getApiService(context).getDocumentsByUser(
@@ -51,14 +51,14 @@ class GraphViewModel : ViewModel() {
                         page = page,
                         startDate = startDate,
                         endDate = endDate,
-                        size = 5
+                        size = 10
                     )
                 }
 
                 if (response != null && response.isSuccessful) {
                     response.body()?.let { responseList ->
                         val uniqueDocuments = responseList.filter { it !in simplesNacional }
-                        simplesNacional = simplesNacional + uniqueDocuments
+                        simplesNacional += uniqueDocuments
                         taxes = simplesNacional.flatMap { it.taxes }
                         hasMorePages = uniqueDocuments.isNotEmpty()
                     }
@@ -67,12 +67,48 @@ class GraphViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao carregar documentos: ${e.message}")
-            } finally {
-                isLoading = false
             }
         }
     }
 
+    fun getDocumentsWODate(context: Context, page: Int) {
+        if (!hasMorePages) {
+            return
+        }
+
+        val sessionManager = SessionManager(context)
+        val userId = sessionManager.fetchUserId()
+        viewModelScope.launch {
+            try {
+                val response = userId?.let {
+                    RetrofitInstance.getApiService(context).getDocumentsByUserWODate(
+                        userId = it,
+                        page = page,
+                        size = 10
+                    )
+                }
+
+                if (response != null) {
+                    if (response.isSuccessful) {
+                        Log.d("getDocumentsWODate", "$page")
+                        response.body()?.let { responseList ->
+
+                            val uniqueDocuments = responseList.filter { it !in simplesNacional }
+                            simplesNacional += uniqueDocuments
+                            taxes = simplesNacional.flatMap { it.taxes }
+                            filterDocuments()
+
+                            hasMorePages = uniqueDocuments.isNotEmpty()
+                        }
+                    } else {
+                        hasMorePages = false
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("getDocumentsWODate", "Erro na requisição: ${e.message}", e)
+            }
+        }
+    }
 
     fun updateSelectedDocument(simplesModel: SimplesModel) {
         selectedDocument = simplesModel
@@ -130,46 +166,7 @@ class GraphViewModel : ViewModel() {
     }
 
 
-    fun getDocumentsWODate(context: Context, page: Int) {
-        if (isLoading || !hasMorePages) {
-            return
-        }
 
-        val sessionManager = SessionManager(context)
-        val userId = sessionManager.fetchUserId()
-        viewModelScope.launch {
-            isLoading = true
-            try {
-
-                val response = userId?.let {
-                    RetrofitInstance.getApiService(context).getDocumentsByUserWODate(userId = it, page = page, size = 10)
-                }
-
-
-
-                if (response != null) {
-                    if (response.isSuccessful) {
-                        Log.d("fodase", "$page")
-                        response.body()?.let { responseList ->
-
-                            val uniqueDocuments = responseList.filter { it !in simplesNacional }
-                            simplesNacional += uniqueDocuments
-                            taxes = simplesNacional.flatMap { it.taxes }
-                            filterDocuments()
-
-                            hasMorePages = uniqueDocuments.isNotEmpty()
-                        }
-                    } else {
-                        hasMorePages = false
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("getDocumentsWODate", "Erro na requisição: ${e.message}", e)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
 
 
 

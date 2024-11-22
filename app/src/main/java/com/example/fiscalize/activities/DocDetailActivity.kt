@@ -3,6 +3,7 @@ package com.example.fiscalize.activities
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.fiscalize.components.TopBarComponent
 import com.example.fiscalize.model.documents.TaxModel
 import com.example.fiscalize.viewModel.GraphViewModel
 
@@ -22,11 +24,16 @@ fun DocDetailActivity(
 ) {
     val document = viewModel.selectedDocument
 
+    Scaffold(
+        topBar = { TopBarComponent() },
+    ) { innerPadding ->
+
     if (document != null) {
         Column(
+
             modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(innerPadding)
         ) {
             Text(
                 text = "Detalhes do Documento",
@@ -68,6 +75,7 @@ fun DocDetailActivity(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.error
         )
+    }
     }
 }
 

@@ -45,7 +45,6 @@ fun SimplesCard(document: SimplesModel, navController: NavController, graphViewM
                 "${document.calculationPeriod}\n${document.documentNumber}",
                 modifier = Modifier.padding(8.dp)
             )
-            Log.d("debug", document.calculationPeriod)
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = "Ir para detalhes do documento",
