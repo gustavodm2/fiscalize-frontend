@@ -36,9 +36,17 @@ interface ApiService {
     suspend fun getDocumentsByUser(
         @Path("id") userId: String,
         @Query("page") page: Int,
+        @Query("size") size: Int,
         @Query("from") startDate: String,
         @Query("to") endDate: String
 
+    ): Response<List<SimplesModel>>
+
+    @GET("users/{id}/simplesNacional")
+    suspend fun getDocumentsByUserWODate(
+        @Path("id") userId: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
     ): Response<List<SimplesModel>>
 
 }

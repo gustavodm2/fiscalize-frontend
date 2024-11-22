@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
@@ -66,8 +67,8 @@ fun HistoryActivity(
 
     var visible by remember { mutableStateOf(false) }
     var selectedDateField by remember { mutableStateOf("") }
-    var startDate by remember { mutableStateOf("de") }
-    var endDate by remember { mutableStateOf("até") }
+    var startDate by rememberSaveable { mutableStateOf("de") }
+    var endDate by rememberSaveable { mutableStateOf("até") }
 
     var currentPage by remember { mutableIntStateOf(1) }
     var isLoading by remember { mutableStateOf(false) }
@@ -82,11 +83,9 @@ fun HistoryActivity(
 
             val newDocuments = graphViewModel.simplesNacional
             if (newDocuments.isNotEmpty()) {
-                // Filtra documentos repetidos
                 filteredDocuments += newDocuments.filter { it !in filteredDocuments }
                 currentPage++
             } else {
-                // Se nenhum documento novo for retornado, interrompe a paginação
                 hasMoreDocuments = false
             }
             isLoading = false
@@ -98,17 +97,35 @@ fun HistoryActivity(
             .collect { lastVisibleIndex ->
                 val totalItems = listState.layoutInfo.totalItemsCount
                 if (lastVisibleIndex != null && totalItems > 0 && lastVisibleIndex == totalItems - 1 && !isLoading && hasMoreDocuments) {
-                    // Usuário chegou ao final da lista e ainda há documentos para carregar
                     isLoading = true
                     graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
 
                     val newDocuments = graphViewModel.simplesNacional
                     if (newDocuments.isNotEmpty()) {
-                        // Filtra documentos repetidos
                         filteredDocuments += newDocuments.filter { it !in filteredDocuments }
                         currentPage++
                     } else {
-                        // Se nenhum documento novo for retornado, interrompe a paginação
+                        hasMoreDocuments = false
+                    }
+                    isLoading = false
+                }
+            }
+    }
+
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastVisibleIndex ->
+                val totalItems = listState.layoutInfo.totalItemsCount
+                if (lastVisibleIndex != null && totalItems > 0 && lastVisibleIndex == totalItems - 1 && !isLoading && hasMoreDocuments) {
+                    isLoading = true
+                    graphViewModel.getDocuments(context, page = currentPage, startDate, endDate)
+
+                    val newDocuments = graphViewModel.simplesNacional
+                    if (newDocuments.isNotEmpty()) {
+                        filteredDocuments += newDocuments.filter { it !in filteredDocuments }
+                        currentPage++
+                    } else {
                         hasMoreDocuments = false
                     }
                     isLoading = false
@@ -166,13 +183,12 @@ fun HistoryActivity(
                         contentDescription = "Filtrar",
                         modifier = Modifier
                             .padding(8.dp)
-                            .size(16.dp)
+                            .size(32.dp)
                             .clickable {
-                                // Reseta a paginação e carrega documentos
                                 currentPage = 1
                                 hasMoreDocuments = true
-                                filteredDocuments = emptyList() // Limpa os documentos filtrados
-                                loadDocuments() // Chama a função de carregar documentos
+                                filteredDocuments = emptyList()
+                                loadDocuments()
                             }
                     )
                 }

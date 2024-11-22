@@ -1,6 +1,5 @@
 package com.example.fiscalize.activities
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.compose.animation.Crossfade
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,9 +36,10 @@ import com.example.fiscalize.viewModel.GraphViewModel
 import com.example.fiscalize.viewModel.updatePieChartWithData
 import com.example.fiscalize.components.TaxCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import com.example.fiscalize.components.TopBarComponent
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
 fun GraphActivity(
      modifier: Modifier = Modifier,
@@ -47,10 +48,13 @@ fun GraphActivity(
      graphViewModel: GraphViewModel
 ) {
      val context = LocalContext.current
+     val listState = rememberLazyListState()
+     val currentPage = remember { graphViewModel.currentPage }
 
-//     LaunchedEffect(Unit) {
-//          graphViewModel.getDocuments(context)
-//     }
+     LaunchedEffect(Unit) {
+          graphViewModel.getDocumentsWODate(context, page = currentPage)
+     }
+
 
      Scaffold(
           topBar = { TopBarComponent() }

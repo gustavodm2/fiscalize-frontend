@@ -52,7 +52,7 @@ fun TaxCard(tax: FilteredTaxes, navController: NavController, graphViewModel: Gr
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(
-                    text = tax.denomination,
+                    text = tax.denomination.split(" ")[0],
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
